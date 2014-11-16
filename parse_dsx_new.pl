@@ -2,7 +2,6 @@
 use v5.10;
 
 use FindBin '$RealBin';
-use Datahub::Tools qw/read_file enc_terminal/;
 use utf8;
 use strict;
 use warnings;
@@ -12,8 +11,6 @@ use Data::Printer {
     output         => 'stdout',
     hash_separator => ':  ',
     return_value   => 'pass',
-
-    #    caller_info    => 1,
 };
 
 enc_terminal();
@@ -47,26 +44,31 @@ sub display_dsx_content {
 
     my $t = Text::ASCIITable->new(
         { headingText => 'Parsing ORCHESTRATE of ' . $file_name } );
-    $t->setCols( 'Id', 'stage_name', 'op_name', 'inputs', 'outputs',
-        'outs_body' );
+    $t->setCols(
+        'Id',      'stage_name', 'op_name', 'inputs',
+        'in_type', 'outputs',    'out_type'
+    );
     my $i = 1;
     foreach my $stage ( @{$parsed_dsx} ) {
         if (   $stage->{operator_name} eq 'copy'
             && $stage->{stage_name} eq 'DWH_REESTRS_DS' )
         {
-
-            my ( $in, $out ) = ( '', '' );
+            my ( $in, $in_type, $out, $out_type ) = ( '', '', '', '' );
             if ( $stage->{ins}->{in} eq 'yes' ) {
                 $in = join "\n", $_->{link_name}
+                  for @{ $stage->{ins}->{inputs} };
+                $in_type = join "\n", $_->{link_type}
                   for @{ $stage->{ins}->{inputs} };
             }
 
             if ( $stage->{ins}->{out} eq 'yes' ) {
                 $out = join "\n", $_->{link_name}
                   for @{ $stage->{ins}->{outputs} };
+                $out_type = join "\n", $_->{link_type}
+                  for @{ $stage->{ins}->{outputs} };
             }
             $t->addRow( $i, $stage->{stage_name}, $stage->{operator_name},
-                $in, $out, '$stage->{ins}->{body}' );
+                $in, $in_type, $out, $out_type );
             $t->addRowLine();
 
             $i++;
@@ -81,15 +83,6 @@ sub start_parse {
     local $/ = '';
     my @parsed_dsx = ();
     while ( $data =~ m/$ORCHESTRATE_BODY_RX/xsg ) {
-
-=pod
-print "\nSTART:\n";
-        p $+{stage_name};
-        p $+{operator_name};
-print "\nbody:\n";
-        p $+{stage_body};
-=cut
-
         my %stage = ();
         my $ins   = process_stage_body( $+{stage_body} );
         $stage{ins}           = $ins;
@@ -124,33 +117,27 @@ sub process_stage_body {
 
 sub get_inout_links {
     my ($body) = @_;
-
-    #say "\ndebug";
-    #p $body;
-    my @links = ();
-    my $link  = qr{
-                   '
-                   (?<link_name>
+    my @links  = ();
+    my $link   = qr{0(?:<|>)(?:\||)\s
+         \[
+         (?<link_type>.*?)
+         \]
+                   \s 
+         '
+         (?:
+         (?<link_name>
 					 \w+:
 					 \w+
-					 .v)
+					 .v
+		 )
 					 |
 					 \[.*?\]			 
-					 (?<link_name>
+		(?<link_name>
 					 \w+.ds
-					 )' 
+		)
+		)' 
 		      }xs;
 
-    #my $link   = qr{
-    #     '
-    #		 \w+:
-    #		 (?<link_name>\w+)
-    #		 .v
-    #		 |
-    #		 \[.*?\]
-    #		 (?<link_name>\w+.ds)
-    #		 '
-    # }xs;
     while ( $body =~ m/$link/g ) {
         my %link_param = ();
         $link_param{link_name} = $+{link_name};
@@ -161,5 +148,25 @@ sub get_inout_links {
 
 }
 
+sub enc_terminal {
+
+    if (-t) {
+        binmode( STDIN,  ":encoding(console_in)" );
+        binmode( STDOUT, ":encoding(console_out)" );
+        binmode( STDERR, ":encoding(console_out)" );
+    }
+}
+
+sub read_file {
+    my ($filename) = @_;
+
+    open my $in, '<:encoding(UTF-8)', $filename
+      or die "Could not open '$filename' for reading $!";
+    local $/ = undef;
+    my $all = <$in>;
+    close $in;
+
+    return $all;
+}
 __DATA__
   
