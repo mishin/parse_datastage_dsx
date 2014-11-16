@@ -45,36 +45,95 @@ sub display_dsx_content {
     my $t = Text::ASCIITable->new(
         { headingText => 'Parsing ORCHESTRATE of ' . $file_name } );
     $t->setCols(
-        'Id',      'stage_name', 'op_name', 'inputs',
-        'in_type', 'outputs',    'out_type'
+        'Id',      'stage_name', 'op_name',    'inputs',
+        'num',     'field_name', 'field_type', 'is_null',
+        'outputs', 'num',        'field_name', 'field_type',
+        'is_null'
     );
     my $i = 1;
     foreach my $stage ( @{$parsed_dsx} ) {
-        if (   $stage->{operator_name} eq 'copy'
-            && $stage->{stage_name} eq 'DWH_REESTRS_DS' )
-        {
-            my ( $in, $in_type, $out, $out_type ) = ( '', '', '', '' );
-            if ( $stage->{ins}->{in} eq 'yes' ) {
-                $in = join "\n", $_->{link_name}
-                  for @{ $stage->{ins}->{inputs} };
-                $in_type = join "\n", $_->{link_type}
-                  for @{ $stage->{ins}->{inputs} };
-            }
 
-            if ( $stage->{ins}->{out} eq 'yes' ) {
-                $out = join "\n", $_->{link_name}
-                  for @{ $stage->{ins}->{outputs} };
-                $out_type = join "\n", $_->{link_type}
-                  for @{ $stage->{ins}->{outputs} };
-            }
-            $t->addRow( $i, $stage->{stage_name}, $stage->{operator_name},
-                $in, $in_type, $out, $out_type );
+        #  if (
+        #      $stage->{operator_name} eq 'copy'
+
+        #&& $stage->{stage_name} eq 'DWH_REESTRS_DS'
+        #    )
+        # {
+        #p $stage;
+        my ( $in, $in_type, $out, $out_type ) = ( '', '', '', '' );
+        if ( $stage->{ins}->{in} eq 'yes' ) {
+            $in = join "\n", $_->{link_name} for @{ $stage->{ins}->{inputs} };
+            $in_type = join "\n", $_->{link_type}
+              for @{ $stage->{ins}->{inputs} };
+
+        }
+
+        if ( $stage->{ins}->{out} eq 'yes' ) {
+            $out = join "\n", $_->{link_name} for @{ $stage->{ins}->{outputs} };
+            $out_type = join "\n", $_->{link_type}
+              for @{ $stage->{ins}->{outputs} };
+
+        }
+        $t->addRow( $i, $stage->{stage_name}, $stage->{operator_name},
+            $in, '', '', '', '', $out, '', '', '', '' );
+        if ( ${ $stage->{ins}->{inputs} }[0]->{is_param} eq 'yes' ) {
             $t->addRowLine();
+            my $j = 1;
+            for my $f ( @{ ${ $stage->{ins}->{inputs} }[0]->{params} } ) {
+                $t->addRow( '', '', '', '', $j, $f->{field_name},
+                    $f->{field_type}, $f->{is_null}, '', '', '', '', '' );
+                $t->addRowLine();
+                $j++;
+            }
+        }
 
+        if ( ${ $stage->{ins}->{outputs} }[0]->{is_param} eq 'yes' ) {
+            $t->addRowLine();
+            my $y = 1;
+            for my $f ( @{ ${ $stage->{ins}->{outputs} }[0]->{params} } ) {
+                $t->addRow( '', '', '', '', '', '', '', '', '', $y,
+                    $f->{field_name}, $f->{field_type}, $f->{is_null} );
+                $t->addRowLine();
+                $y++;
+            }
+        }
+        $t->addRowLine();
+        $i++;
+
+        # }
+
+    }
+
+    print $t;
+}
+
+sub display_fields {
+    my $fields = shift;
+
+    #my @f=@$fields;
+    #p @f;
+    #say $f[0]->{is_param};
+    if ( $$fields[0]->{is_param} eq 'yes' ) {
+        my $fields_table = Text::ASCIITable->new(
+            { headingText => 'Fields of ' . $$fields[0]->{link_name} } );
+        $fields_table->setCols( 'field_name', 'field_type', 'is_null' );
+        my $i = 1;
+
+        #p $$fields[0]->{params};
+        my @fields_of_link = @{ $$fields[0]->{params} };
+        for my $f (@fields_of_link) {
+            p $f;
+            print ref $f;
+
+            #p $f->{field_name};
+            say
+"$fields_table->addRow( $i,$f->{field_name} ,$f->{field_type},$f->{is_null});	";
+
+            #$fields_table->addRowLine();
             $i++;
         }
+        print $fields_table;
     }
-    print $t;
 }
 
 sub start_parse {
@@ -142,9 +201,42 @@ sub get_inout_links {
         my %link_param = ();
         $link_param{link_name} = $+{link_name};
         $link_param{link_type} = $+{link_type};
+        $link_param{is_param}  = 'no';
+        if ( length( $link_param{link_type} ) >= 6
+            && substr( $link_param{link_type}, 0, 6 ) eq 'modify' )
+        {
+            $link_param{is_param} = 'yes';
+            $link_param{params}   = get_fields( $+{link_type} );
+        }
         push @links, \%link_param;
     }
     return \@links;
+
+}
+
+sub get_fields {
+    my $body_for_fields = shift;
+
+    #p $body_for_fields;
+    my @fields = ();
+    my $field  = qr{
+    (?<field_name>\w+)
+    :
+    (?<is_null>not_nullable|nullable)\s
+    (?<field_type>.*?)
+    =
+    \g{field_name}
+    ;
+     }xs;
+
+    while ( $body_for_fields =~ m/$field/g ) {
+        my %field_param = ();
+        $field_param{field_name} = $+{field_name};
+        $field_param{is_null}    = $+{is_null};
+        $field_param{field_type} = $+{field_type};
+        push @fields, \%field_param;
+    }
+    return \@fields;
 
 }
 
