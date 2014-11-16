@@ -57,25 +57,16 @@ sub display_dsx_content {
 
             my ( $in, $out ) = ( '', '' );
             if ( $stage->{ins}->{in} eq 'yes' ) {
-
-                #p $stage->{ins}->{inputs};
-                for my $inputs ( @{ $stage->{ins}->{inputs} } ) {
-                    $in = $in . $inputs->{link_name} . "\n";
-                }
-
-                #$in = join "\n", @{ $stage->{ins}->{inputs} };
+                $in = join "\n", $_->{link_name}
+                  for @{ $stage->{ins}->{inputs} };
             }
 
             if ( $stage->{ins}->{out} eq 'yes' ) {
-
-                #p $stage->{ins}->{outputs};
-                #$out = join "\n", @{ $stage->{ins}->{outputs} };
-                for my $inputs ( @{ $stage->{ins}->{outputs} } ) {
-                    $out = $out . $inputs->{link_name} . "\n";
-                }
+                $out = join "\n", $_->{link_name}
+                  for @{ $stage->{ins}->{outputs} };
             }
             $t->addRow( $i, $stage->{stage_name}, $stage->{operator_name},
-                $in, $out, $stage->{ins}->{body} );
+                $in, $out, '$stage->{ins}->{body}' );
             $t->addRowLine();
 
             $i++;
@@ -88,7 +79,6 @@ sub start_parse {
     my $data                = shift;
     my $ORCHESTRATE_BODY_RX = make_regexp();
     local $/ = '';
-    my $i          = 1;
     my @parsed_dsx = ();
     while ( $data =~ m/$ORCHESTRATE_BODY_RX/xsg ) {
 
