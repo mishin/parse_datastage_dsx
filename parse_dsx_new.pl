@@ -1,7 +1,6 @@
 #! perl
 use v5.10;
 
-#use lib 'c:\Temp\Perl\scripts\develop\Datahub-Tools\lib';
 use FindBin '$RealBin';
 use Datahub::Tools qw/read_file enc_terminal/;
 use utf8;
@@ -15,27 +14,6 @@ enc_terminal();
 
 my ($file_name) = 'orchestrate_code_body.xml';
 my $data = read_file($file_name);
-
-#### STAGE: DWH_REESTRS_DS
-
-=pod
-#################################################################
-#### STAGE: T199
-## Operator
-transform
-## Operator options
--flag run
--name 'V0S276_audi_05_ChangeCaptureApplyUPP_T199'
-
-## General options
-[ident('T199'); jobmon_ident('T199')]
-## Inputs
-0< [] 'LJ108:L109.v'
-## Outputs
-0> [] 'T199:INS.v'
-1> [] 'T199:UPD.v'
-;
-=cut
 
 my $operator_rx      = qr{\Q#### STAGE: \E(?<stage_name>\w+)};
 my $operator_name_rx = qr{\Q## Operator\E\n(?<operator_name>\w+)\n\#};
@@ -116,7 +94,6 @@ sub get_inout_links {
     my ($body) = @_;
     my @links = ();
 
-    # '[&"psProjectsPath.ProjectFilePath"]DWH_REESTRS_AUDIT_R
     while (
         $body =~ m/'
 					 \w+:
@@ -136,19 +113,3 @@ sub get_inout_links {
 
 __DATA__
   
-# Dispatch table (hash of subroutine references)
-my %dispatch = (
-        this => \&this,
-        that => \&that,
-        "something else" => \&something_else,
-);
- 
-# Check that the action exists in our table
-if ( exists $dispatch{$action} ) {
-        $dispatch{$action}->();
-} else {
-        unknown_action();
-}
-
-This allows us to add or change new cases easily, in a single place, while simplifying our code. If your subroutines are designed to accept the same parameter list, then you can pass in parameters when you invoke the subroutine:
-$dispatch{$action}->($dbh, $cgi, $status);
