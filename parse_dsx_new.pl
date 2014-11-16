@@ -9,9 +9,10 @@ use warnings;
 use Encode::Locale;
 use Text::ASCIITable;
 use Data::Printer {
-    output => 'stdout',
+    output         => 'stdout',
     hash_separator => ':  ',
     return_value   => 'pass',
+
     #    caller_info    => 1,
 };
 
@@ -46,29 +47,35 @@ sub display_dsx_content {
 
     my $t = Text::ASCIITable->new(
         { headingText => 'Parsing ORCHESTRATE of ' . $file_name } );
-    $t->setCols( 'Id', 'stage_name', 'op_name', 'inputs', 'outputs','outs_body' );
+    $t->setCols( 'Id', 'stage_name', 'op_name', 'inputs', 'outputs',
+        'outs_body' );
     my $i = 1;
     foreach my $stage ( @{$parsed_dsx} ) {
-        if ( $stage->{operator_name} eq  'copy' && $stage->{stage_name} eq 'DWH_REESTRS_DS') {
-			
-            my ( $in, $out ) = ('','');
+        if (   $stage->{operator_name} eq 'copy'
+            && $stage->{stage_name} eq 'DWH_REESTRS_DS' )
+        {
+
+            my ( $in, $out ) = ( '', '' );
             if ( $stage->{ins}->{in} eq 'yes' ) {
-				#p $stage->{ins}->{inputs};
-				for my $inputs (@{ $stage->{ins}->{inputs} }){
-				$in=$in.$inputs->{link_name}."\n";
-					}
+
+                #p $stage->{ins}->{inputs};
+                for my $inputs ( @{ $stage->{ins}->{inputs} } ) {
+                    $in = $in . $inputs->{link_name} . "\n";
+                }
+
                 #$in = join "\n", @{ $stage->{ins}->{inputs} };
             }
 
             if ( $stage->{ins}->{out} eq 'yes' ) {
-				#p $stage->{ins}->{outputs}; 
+
+                #p $stage->{ins}->{outputs};
                 #$out = join "\n", @{ $stage->{ins}->{outputs} };
-                for my $inputs (@{ $stage->{ins}->{outputs} }){
-				$out=$out.$inputs->{link_name}."\n";
-					}
+                for my $inputs ( @{ $stage->{ins}->{outputs} } ) {
+                    $out = $out . $inputs->{link_name} . "\n";
+                }
             }
             $t->addRow( $i, $stage->{stage_name}, $stage->{operator_name},
-                $in, $out, $stage->{ins}->{body});
+                $in, $out, $stage->{ins}->{body} );
             $t->addRowLine();
 
             $i++;
@@ -110,10 +117,10 @@ sub process_stage_body {
     my $outputs_rx = qr{## Outputs\n(?<outputs_name>.*?)^;$}sm;
 
     my ( $inputs, $outputs ) = ( '', '' );
-    $outs{in}  = 'no';
-    $outs{out} = 'no';
+    $outs{in}   = 'no';
+    $outs{out}  = 'no';
     $outs{body} = $stage_body;
-    
+
     if ( $stage_body =~ $inputs_rx ) {
         $outs{inputs} = get_inout_links( $+{inputs_name} );
         $outs{in}     = 'yes';
@@ -127,10 +134,11 @@ sub process_stage_body {
 
 sub get_inout_links {
     my ($body) = @_;
+
     #say "\ndebug";
     #p $body;
-    my @links  = ();
-    my $link   = qr{
+    my @links = ();
+    my $link  = qr{
                    '
                    (?<link_name>
 					 \w+:
@@ -142,20 +150,21 @@ sub get_inout_links {
 					 \w+.ds
 					 )' 
 		      }xs;
-		      #my $link   = qr{
-              #     '
-			#		 \w+:
-			#		 (?<link_name>\w+)
-			#		 .v
-			#		 |
-			#		 \[.*?\]
-			#		 (?<link_name>\w+.ds)
-			#		 ' 
-		     # }xs;
+
+    #my $link   = qr{
+    #     '
+    #		 \w+:
+    #		 (?<link_name>\w+)
+    #		 .v
+    #		 |
+    #		 \[.*?\]
+    #		 (?<link_name>\w+.ds)
+    #		 '
+    # }xs;
     while ( $body =~ m/$link/g ) {
-		my %link_param=();
-		$link_param{link_name}=$+{link_name};
-		$link_param{link_type}=$+{link_type};		
+        my %link_param = ();
+        $link_param{link_name} = $+{link_name};
+        $link_param{link_type} = $+{link_type};
         push @links, \%link_param;
     }
     return \@links;
