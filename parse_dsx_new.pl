@@ -24,7 +24,7 @@ sub main {
     #p $parsed_dsx;
     my $only_links = reformat_links($parsed_dsx);
 
-    #    show_dsx_content( $parsed_dsx, $file_name );
+        show_dsx_content( $parsed_dsx, $file_name );
 }
 
 sub reformat_links {
