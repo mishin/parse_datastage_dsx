@@ -155,6 +155,14 @@ sub start_parse {
 sub process_stage_body {
     my ($stage_body) = @_;
     my %outs;
+=pod
+## Inputs
+0< [] 'LJ108:L109.v'
+## Outputs
+0> [] 'T199:INS.v'
+1> [] 'T199:UPD.v'
+;
+=cut    
     my $inputs_rx  = qr{## Inputs\n(?<inputs_name>.*?)(?:#|^;$)}sm;
     my $outputs_rx = qr{## Outputs\n(?<outputs_name>.*?)^;$}sm;
 
@@ -177,7 +185,10 @@ sub process_stage_body {
 sub get_inout_links {
     my ($body) = @_;
     my @links  = ();
-    my $link   = qr{0(?:<|>)(?:\||)\s
+    my $link   = qr{\d+
+    (?:<|>)
+    (?:\||)
+    \s
          \[
          (?<link_type>.*?)
          \]
