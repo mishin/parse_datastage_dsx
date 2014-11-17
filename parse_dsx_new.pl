@@ -155,6 +155,7 @@ sub start_parse {
 sub process_stage_body {
     my ($stage_body) = @_;
     my %outs;
+
 =pod
 ## Inputs
 0< [] 'LJ108:L109.v'
@@ -163,6 +164,7 @@ sub process_stage_body {
 1> [] 'T199:UPD.v'
 ;
 =cut    
+
     my $inputs_rx  = qr{## Inputs\n(?<inputs_name>.*?)(?:#|^;$)}sm;
     my $outputs_rx = qr{## Outputs\n(?<outputs_name>.*?)^;$}sm;
 
