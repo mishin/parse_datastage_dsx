@@ -23,7 +23,8 @@ sub main {
 
     #p $parsed_dsx;
     my $only_links = reformat_links($parsed_dsx);
-    show_dsx_content( $parsed_dsx, $file_name );
+
+    #    show_dsx_content( $parsed_dsx, $file_name );
 }
 
 sub reformat_links {
@@ -36,8 +37,10 @@ sub reformat_links {
             for ( @{ $stage->{ins}->{inputs} } ) {
                 if ( $_->{is_param} eq 'yes' ) {
                     my %in_links = ();
-                    $in_links{link_name} = $_->{link_name};
-                    $in_links{params}    = $_->{params};
+                    $in_links{link_name}        = $_->{link_name};
+                    $in_links{params}           = $_->{params};
+                    $in_links{link_keep_fields} = $_->{link_keep_fields};
+                    $in_links{trans_name}       = $_->{trans_name};
                     push @only_links, \%in_links;
                 }
             }
@@ -47,8 +50,10 @@ sub reformat_links {
             for ( @{ $stage->{ins}->{outputs} } ) {
                 if ( $_->{is_param} eq 'yes' ) {
                     my %out_links = ();
-                    $out_links{link_name} = $_->{link_name};
-                    $out_links{params}    = $_->{params};
+                    $out_links{link_name}        = $_->{link_name};
+                    $out_links{params}           = $_->{params};
+                    $out_links{link_keep_fields} = $_->{link_keep_fields};
+                    $out_links{trans_name}       = $_->{trans_name};
                     push @only_links, \%out_links;
                 }
             }
@@ -56,6 +61,7 @@ sub reformat_links {
         }
 
     }
+
     p @only_links;
 }
 
@@ -211,39 +217,45 @@ sub parse_stage_body {
     $outs{out}  = 'no';
     $outs{body} = $stage_body;
     if ( $stage_body =~ $inputs_rx ) {
-        $outs{inputs} = parse_inout_links( $+{inputs_body} );
+        $outs{inputs} = parse_out_links( $+{inputs_body} );
         $outs{in}     = 'yes';
     }
     if ( $stage_body =~ $outputs_rx ) {
-        $outs{outputs} = parse_inout_links( $+{outputs_body} );
+        $outs{outputs} = parse_in_links( $+{outputs_body} );
         $outs{out}     = 'yes';
     }
     return \%outs;
 }
 
-sub parse_inout_links {
+sub parse_in_links {
     my ($body) = @_;
-    my @links  = ();
-=pod
-[modify (
-  PTUSR6_D:nullable date=PTUSR6_D;
-  PTDATRE:nullable date=PTDATRE;
-keep
-  SCAB,SCAN,SCAS,IDAT,
-  PTDTN,SRC_STM_ID,PTDTPP,PTDTPO,
-  PTUSR6_D,PTDATRE;
-)] 'MART_UREP_WRH_DS:L100.v'
-=cut
-    
-    my $link   = qr{\d+
+    my @links = ();
+
+    my $link = qr{\d+
     (?:<|>)
     (?:\||)
     \s
          \[
-         (?<link_type>.*?)
+        (?<link_type>
+        (?:
+        modify\s\(
+          (?:
+         (?<link_fields>
+         .*?;|.*?
+         )
+         )\n
+         keep
+         (?<link_keep_fields>
+         .*?
+         )
+         ;
+         .*?
+          \)
+         )
+	     |.*
+	     )
          \]
                    \s 
-#'DWH_CCH_DS:L20.v'                   
          '
          (?:
          			 (?<trans_name>\w+):
@@ -261,19 +273,107 @@ keep
     while ( $body =~ m/$link/g ) {
         my %link_param = ();
         $link_param{link_name} = $+{link_name};
-        $link_param{link_type} = $+{link_type};
-        $link_param{trans_name} = $+{trans_name};
-        $link_param{is_param}  = 'no';
-        if ( length( $link_param{link_type} ) >= 6
-            && substr( $link_param{link_type}, 0, 6 ) eq 'modify' )
+        $link_param{link_type} = $+{link_fields};
+
+        #$link_param{link_type} = $+{link_type};
+        $link_param{trans_name} = $+{trans_name} if defined $+{trans_name};
+        $link_param{is_param} = 'no';
+        if ( defined $+{link_fields} )
+
+          #if ( length( $link_param{link_type} ) >= 6
+          #&& substr( $link_param{link_type}, 0, 6 ) eq 'modify' )
         {
             $link_param{is_param} = 'yes';
-            $link_param{params}   = parse_fields( $+{link_type} );
+            $link_param{params}   = parse_fields( $+{link_fields} );
+            $link_param{link_keep_fields} =
+              parse_keep_fields( $+{link_keep_fields} )
+              if defined $+{link_keep_fields};
         }
         push @links, \%link_param;
     }
+
+    #p @links;
     return \@links;
 
+}
+
+sub parse_out_links {
+    my ($body) = @_;
+    my @links = ();
+
+    my $link = qr{\d+
+    (?:<|>)
+    (?:\||)
+    \s
+         \[
+        (?<link_type>
+        (?:
+        modify\s\(
+          (?:
+         (?<link_fields>
+         .*?;|.*?
+         )
+         )\n
+         keep
+         (?<link_keep_fields>
+         .*?
+         )
+         ;
+         .*?
+          \)
+         )
+	     |.*
+	     )
+         \]
+                   \s 
+         '
+         (?:
+         			 (?<trans_name>\w+):
+					 (?<link_name>\w+)
+					 .v
+		 
+					 |
+					 \[.*?\]			 
+		(?<link_name>
+					 \w+.ds
+		)
+		)' 
+		      }xs;
+
+    while ( $body =~ m/$link/g ) {
+        my %link_param = ();
+        $link_param{link_name} = $+{link_name};
+        $link_param{link_type} = $+{link_fields};
+
+        #$link_param{link_type} = $+{link_type};
+        $link_param{trans_name} = $+{trans_name} if defined $+{trans_name};
+        $link_param{is_param} = 'no';
+        if ( defined $+{link_fields} )
+
+          #if ( length( $link_param{link_type} ) >= 6
+          #&& substr( $link_param{link_type}, 0, 6 ) eq 'modify' )
+        {
+            $link_param{is_param} = 'yes';
+            $link_param{params}   = parse_fields( $+{link_fields} );
+            $link_param{link_keep_fields} =
+              parse_keep_fields( $+{link_keep_fields} )
+              if defined $+{link_keep_fields};
+        }
+        push @links, \%link_param;
+    }
+
+    #p @links;
+    return \@links;
+
+}
+
+sub parse_keep_fields {
+    my $body_for_keep_fields = shift;
+    $body_for_keep_fields =~ s/^\s+|\s+$//g;
+
+    #p $body_for_keep_fields;
+    my @fields = split /\s*,\s*/s, $body_for_keep_fields;
+    return \@fields;
 }
 
 sub parse_fields {
