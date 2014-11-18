@@ -1882,16 +1882,30 @@ sub parse_stage_body {
     my $inputs_rx  = qr{## Inputs\n(?<inputs_body>.*?)(?:#|^;$)}sm;
     my $outputs_rx = qr{## Outputs\n(?<outputs_body>.*?)^;$}sm;
 
+=pod
+## General options
+[ident('LKUP101'); jobmon_ident('LKUP101')]
+## Inputs
+0< [] 'T100:L101.v'
+1< [] 'T10:L11.v'
+## Outputs
+
+=cut
+
+
     my ( $inputs, $outputs ) = ( '', '' );
     $outs{in}   = 'no';
     $outs{out}  = 'no';
     $outs{body} = $stage_body;
     if ( $stage_body =~ $inputs_rx ) {
-        $outs{inputs} = parse_out_links( $+{inputs_body} );
+		
+	
+        $outs{inputs} = parse_in_links( $+{inputs_body} );
         $outs{in}     = 'yes';
     }
     if ( $stage_body =~ $outputs_rx ) {
-        $outs{outputs} = parse_in_links( $+{outputs_body} );
+		
+        $outs{outputs} = parse_out_links( $+{outputs_body} );
         $outs{out}     = 'yes';
     }
     return \%outs;
@@ -1901,29 +1915,18 @@ sub parse_in_links {
     my ($body) = @_;
     my @links = ();
 
+=pod
+0< [] 'T100:L101.v'
+1< [] 'T10:L11.v'
+=cut
+
+
     my $link = qr{\d+
-    (?:<|>)
-    (?:\||)
-    \s
-         \[
-        (?<link_type>
-        (?:
-        modify\s\(
-          (?:
-         (?<link_fields>
-         .*?;|.*?
-         )
-         )\n
-         keep
-         (?<link_keep_fields>
-         .*?
-         )
-         ;
-         .*?
-          \)
-         )
-	     |.*
-	     )
+    <     (?:\||)
+    \s   \[
+    (?<link_fields>
+        .*?	     
+     )
          \]
                    \s 
          '
@@ -1961,7 +1964,9 @@ sub parse_in_links {
         }
         push @links, \%link_param;
     }
-
+   #print "\n\n Debug in_links!!! \n\n";
+    #p $body;
+    
     #p @links;
     return \@links;
 
@@ -1971,6 +1976,26 @@ sub parse_out_links {
     my ($body) = @_;
     my @links = ();
 
+=pod
+## General options
+[ident('T108'); jobmon_ident('T108')]
+## Inputs
+0< [] 'T107:L107.v'
+## Outputs
+0> [] 'T108:L108.v'
+1> [] 'T108:L_DBG01.v'
+;
+## General options
+[ident('T199'); jobmon_ident('T199')]
+## Inputs
+0< [] 'LJ108:L109.v'
+## Outputs
+0> [] 'T199:INS.v'
+1> [] 'T199:UPD.v'
+;
+
+=cut
+
     my $link = qr{\d+
     (?:<|>)
     (?:\||)
@@ -1992,7 +2017,7 @@ sub parse_out_links {
          .*?
           \)
          )
-	     |.*
+	     |.*?
 	     )
          \]
                    \s 
@@ -2031,8 +2056,11 @@ sub parse_out_links {
         }
         push @links, \%link_param;
     }
-
+print "\n\n Debug out_links!!! \n\n";
+    #p $body;
+    
     #p @links;
+    
     return \@links;
 
 }
