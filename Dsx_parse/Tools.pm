@@ -1182,7 +1182,8 @@ sub pexcel_table_links {
 sub show_stage_prop {
     my ($j, $col, $all, $input_links, $ref_stages_with_types, $suffix) = @_;
     print "\nDebug say \$link_name; \n\n";
-	# $col--;
+
+    # $col--;
     my $max = 0;
     for my $link_name (@{$input_links}) {
         my $lname = $link_name . $suffix;    #'_input_links';
@@ -1191,15 +1192,19 @@ sub show_stage_prop {
         pexcel_head($j + 2, $col,     $all, 'field_name');
         pexcel_head($j + 2, $col + 1, $all, 'field_type');
         pexcel_head($j + 2, $col + 2, $all, 'not_nullable');
-		pexcel_head($j + 2, $col + 3, $all, 'link_keep_fields');
+        pexcel_head($j + 2, $col + 3, $all, 'link_keep_fields');
 
-        my $g =          pexcel_table_fields($j + 2, $col, $all,            $ref_stages_with_types->{$lname}->{params});
-		my $q =          pexcel_table($j + 2, $col + 3, $all,            $ref_stages_with_types->{$lname}->{link_keep_fields});
-        $max = max($max, $g, $q);		
+        my $g =
+          pexcel_table_fields($j + 2, $col, $all,
+            $ref_stages_with_types->{$lname}->{params});
+        my $q =
+          pexcel_table($j + 2, $col + 3, $all,
+            $ref_stages_with_types->{$lname}->{link_keep_fields});
+        $max = max($max, $g, $q);
     }
-	
-	$col = $col + 4;
-    $j = $j;# + 4 + $max;
+
+    $col = $col + 4;
+    $j   = $j;         # + 4 + $max;
     return $j;
 }
 
@@ -1217,24 +1222,31 @@ sub fill_excel_stages_and_links {
     );
     pexcel_head($j + 6, $col, $all, 'stage_name');
     pexcel_head($j + 7, $col, $all, 'operator_name');
-    my $max = 0;
+    my ($max, $max_input, $max_output) = (0, 0, 0);
     for my $stage (@{$links}) {
         $col++;
         pexcel_row($j + 6, $col, $all, $stage->{stage_name});
         pexcel_row($j + 7, $col, $all, $stage->{operator_name});
 
-		if ($stage->{operator_name} eq ''){
-		
-		}
-        my $max_input =
-          pexcel_table_links($j + 9, $col, $all, $stage->{input_links},
-            'input_links');
-        my $max_output =
-          pexcel_table_links($j + 9, $col + 5, $all, $stage->{output_links},
-            'output_links');
+        if ($stage->{operator_name} eq 'copy') {
+            $max_output =
+              pexcel_table_links($j + 9, $col, $all, $stage->{output_links},
+                'output_links');
+            $col = $col + 4;
+        }
+        else {
+            $max_input =
+              pexcel_table_links($j + 9, $col, $all, $stage->{input_links},
+                'input_links');
+            $max_output =
+              pexcel_table_links($j + 9, $col + 5, $all,
+                $stage->{output_links},
+                'output_links');
+            $col = $col + 9;
+        }
 
         $max = max($max, $max_input, $max_output);
-        $col = $col + 9;
+
     }
 
     $j = $j + 4 + $max;
@@ -1474,18 +1486,20 @@ sub fill_excel_stages {
 
     # $j = fill_excel_name_stages( $ref_formats, $curr_job, $stages, $j );
 
-    $j = fill_excel_job_annotation_text($ref_formats, $curr_job,        $ref_job_annotation_texts, $j);
-    #$j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
-    #$j =      fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
-    #$j =       fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
-    #$j =      fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
-    #$j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
+    $j = fill_excel_job_annotation_text($ref_formats, $curr_job,
+        $ref_job_annotation_texts, $j);
+
+#$j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
+#$j =      fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
+#$j =       fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
+#$j =      fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
+#$j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
 
     # $j = fill_excel_only_links($ref_formats, $curr_job, $col, $job_pop, $j);
-   # $j = fill_excel_only_links($job_and_formats, $col, $j);
+    # $j = fill_excel_only_links($job_and_formats, $col, $j);
 
 # $j = fill_excel_stages_and_links($ref_formats, $curr_job, $col, $job_pop,        $j);
-    $j = fill_excel_stages_and_links($job_and_formats, $col, $j+4);
+    $j = fill_excel_stages_and_links($job_and_formats, $col, $j + 4);
 }
 
 #
