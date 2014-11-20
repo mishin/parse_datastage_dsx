@@ -39,6 +39,7 @@ use Sub::Exporter -setup => {
     ],
 };
 
+
 sub enc_terminal {
 
     if (-t) {
@@ -1213,44 +1214,36 @@ sub show_stage_prop {
 #
 sub fill_excel_stages_and_links {
     my ($all, $col, $j) = @_;
-    my ($links, $ref_stages_with_types, $ref_formats, $curr_job, $job_pop) = (
-        $all->{job_pop}->{only_links}->{only_stages_and_links},
-        $all->{job_pop}->{only_links}->{stages_with_types},
-        $all->{ref_formats},
-        $all->{curr_job},
-        $all->{job_pop}
-    );
+    my $links = $all->{job_pop}->{only_links}->{only_stages_and_links};
+
     pexcel_head($j + 6, $col, $all, 'stage_name');
     pexcel_head($j + 7, $col, $all, 'operator_name');
-    my ($max, $max_input, $max_output) = (0, 0, 0);
+
+    my $max = 0;
     for my $stage (@{$links}) {
         $col++;
         pexcel_row($j + 6, $col, $all, $stage->{stage_name});
         pexcel_row($j + 7, $col, $all, $stage->{operator_name});
 
-        if ($stage->{operator_name} eq 'copy') {
-            $max_output =
-              pexcel_table_links($j + 9, $col, $all, $stage->{output_links},
-                'output_links');
-            $col = $col + 4;
-        }
-        else {
-            $max_input =
-              pexcel_table_links($j + 9, $col, $all, $stage->{input_links},
-                'input_links');
-            $max_output =
-              pexcel_table_links($j + 9, $col + 5, $all,
-                $stage->{output_links},
-                'output_links');
-            $col = $col + 9;
-        }
-
-        $max = max($max, $max_input, $max_output);
-
+        ($max, $col) = fill_excel_inout_links($all, $col, $j + 9, $stage);
     }
 
     $j = $j + 4 + $max;
     return $j;
+}
+
+#
+# New subroutine "fill_excel_inout_links" extracted - Thu Nov 20 15:27:27 2014.
+#
+sub fill_excel_inout_links {
+    my ($all, $col, $j, $stage) = @_;
+    my ($max, $loc_max) = (0, 0, 0);
+    for my $link (qw/input_links output_links/) {
+        $loc_max = pexcel_table_links($j, $col, $all, $stage->{$link}, $link);
+        $max = max($max, $loc_max);
+        $col = $col + 5;
+    }
+    return ($max, $col);
 }
 
 #
