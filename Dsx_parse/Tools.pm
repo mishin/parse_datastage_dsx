@@ -398,8 +398,9 @@ sub process_stage {
           process_orchestrate_code_properties($+{orchestrate_code_body},
             $COMPILE_RX_REF->{ORCHESTRATE_CODE_RX});
         my $parsed_dsx = parse_orchestrate_body($+{orchestrate_code_body});
-        print "\nDebug_orig\n\n";
-        p $parsed_dsx;
+
+        # print "\nDebug_orig\n\n";
+        # p $parsed_dsx;
         $only_links = reformat_links($parsed_dsx);
 
         #show_dsx_content( $parsed_dsx, $file_name );
@@ -1160,35 +1161,32 @@ sub pexcel_table_fields {
     return $q;
 }
 
-
 sub pexcel_table_links {
-    my ($j, $col, $all, $ref_array, $suffix) = @_;
+    my ($j, $col, $all, $stage, $suffix) = @_;
     pexcel_head($j, $col, $all, $suffix);
     my $q = 1;
-    for my $single_field (@{$ref_array}) {
+    for my $single_field (@{$stage->{$suffix}}) {
         pexcel_row($j + $q, $col, $all, $single_field);
         $q++;
     }
     $j = $j + $q;
 
-    $j = show_stage_prop(
-        $j, $col, $all, $ref_array,
+    # $j = show_stage_prop(
+  my $max = show_stage_prop(
+        $j, $col, $all, $stage->{$suffix},
         $all->{job_pop}->{only_links}->{stages_with_types},
         '_' . $suffix
     );
-    return $j;
+    # return $j;
+    return $max;
 }
 
 
 sub show_stage_prop {
     my ($j, $col, $all, $input_links, $ref_stages_with_types, $suffix) = @_;
-    print "\nDebug say \$link_name; \n\n";
-
-    # $col--;
     my $max = 0;
     for my $link_name (@{$input_links}) {
         my $lname = $link_name . $suffix;    #'_input_links';
-
 
         pexcel_head($j + 2, $col,     $all, 'field_name');
         pexcel_head($j + 2, $col + 1, $all, 'field_type');
@@ -1206,7 +1204,8 @@ sub show_stage_prop {
 
     $col = $col + 4;
     $j   = $j;         # + 4 + $max;
-    return $j;
+    # return $j;
+    return $max;
 }
 
 #
@@ -1216,16 +1215,26 @@ sub fill_excel_stages_and_links {
     my ($all, $col, $j) = @_;
     my $links = $all->{job_pop}->{only_links}->{only_stages_and_links};
 
-    pexcel_head($j + 6, $col, $all, 'stage_name');
-    pexcel_head($j + 7, $col, $all, 'operator_name');
+	 my @start_stages = ('copy', 'pxbridge');
+     my %start_stages_of = map { $_ => 1 } @start_stages;
 
+
+    # for my $link (qw/input_links output_links/) {
+        # if (not exists $start_stages_of{$stage->{operator_name}}             && $link eq 'input_links')
+	
     my $max = 0;
+	 my $orig_col=$col;
+	# my $save_col=0;
     for my $stage (@{$links}) {
-        $col++;
-        pexcel_row($j + 6, $col, $all, $stage->{stage_name});
-        pexcel_row($j + 7, $col, $all, $stage->{operator_name});
-
-        ($max, $col) = fill_excel_inout_links($all, $col, $j + 9, $stage);
+	 if (not exists $start_stages_of{$stage->{operator_name}}){
+        ($max, $col) = fill_excel_inout_links($all, $col, $j, $stage);
+		$col++;
+		print "\nDebug_max=$max in $stage->{stage_name}\n\n";
+		 }else{
+		 ($max, $col) = fill_excel_inout_links($all, $orig_col, $j+$max, $stage);
+		 $max=max($max,5);
+		 $j=$j+$max+10;
+		 }        
     }
 
     $j = $j + 4 + $max;
@@ -1237,26 +1246,34 @@ sub fill_excel_stages_and_links {
 #
 sub fill_excel_inout_links {
     my ($all, $col, $j, $stage) = @_;
-    my ($max, $loc_max) = (0, 0, 0);
+    my ($col_max, $loc_max) = (0, 0, 0);
+ 
+    pexcel_head($j + 6, $col, $all, 'stage_name');
+    pexcel_row($j + 6, $col + 1, $all, $stage->{stage_name});
+
+    pexcel_head($j + 7, $col, $all, 'operator_name');
+    pexcel_row($j + 7, $col + 1, $all, $stage->{operator_name});
+	
     my @start_stages = ('copy', 'pxbridge');
     my %start_stages_of = map { $_ => 1 } @start_stages;
 
-    # # $delta=(exists $start_stages_of{$stage->{operator_name}})?4:9;
-    # if (exists $start_stages_of{$stage->{operator_name}}) {    ### MIII
+
     for my $link (qw/input_links output_links/) {
-        if (!(  exists $start_stages_of{$stage->{operator_name}}
-                && $link eq 'input_links'
-            )
-          )
-        {
-            $loc_max =
-              pexcel_table_links($j, $col, $all, $stage->{$link}, $link);
-        
-        $max = max($max, $loc_max);
-        $col = $col + 5;
-		}
+	print "\n\n\nDEbug\n\n";
+	say 0+@{$stage->{$link}};
+	p $link;
+	p $stage;
+        #if (not exists $start_stages_of{$stage->{operator_name}}
+        #    && $link eq 'input_links')
+        #{
+		if (0+@{$stage->{$link}} >0){
+            $loc_max = pexcel_table_links($j + 9, $col, $all, $stage, $link);
+            $col_max = max($col_max, $loc_max);
+            $col = $col + 5;
+			}
+        #}
     }
-    return ($max, $col);
+    return ($col_max, $col);#,$j);
 }
 
 #
@@ -1490,14 +1507,15 @@ sub fill_excel_stages {
     my $j   = 1;
     my $col = 3;
 
-    # $j = fill_excel_name_stages( $ref_formats, $curr_job, $stages, $j );
+    $j = fill_excel_name_stages($ref_formats, $curr_job, $stages, $j);
 
     $j = fill_excel_job_annotation_text($ref_formats, $curr_job,
         $ref_job_annotation_texts, $j);
 
-#$j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
+    $j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
+
 #$j =      fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
-#$j =       fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
+#$j =      fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
 #$j =      fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
 #$j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
 
@@ -1671,19 +1689,6 @@ sub patch_dsx_for_prod {
     my ($file_name) = @_;
     my $data = read_file($file_name);
 
-# my $match_exactly='\(412)\(41D)\(418)\(41C)\(410)\(41D)\(418)\(415)!!';
-# $data =~ s/BEGIN DSRECORD.*AnnotationText "\Q${match_exactly}\E.*END DSRECORD//gs;
-# $data =~ s/BEGIN DSRECORD.*AnnotationText*END DSRECORD//mxs;
-#remove_red_box
-
-=pod	
-	$data =~ s/(.*)(BEGIN DSRECORD
-      Identifier "V132A0".*AnnotationText "\\\(412\)\\\(41D\)\\\(418\)\\\(41C\)\\\(410\)\\\(41D\)\\\(418\)\\\(415\)!!.*END DSRECORD)(
-(?=   BEGIN DSRECORD
-      Identifier "V133S0").*)/$1$3/s;
-=cut	  
-
-    #return LOADING_DT
     $data =~ s/\QBEGIN DSSUBRECORD
          Name "LOADING_DT"
          Description "\"2011-12-12\""
@@ -1754,8 +1759,6 @@ sub reformat_links {
                 $in_links{stage_name}    = $stage->{stage_name};
                 $in_links{inout_type}    = $inputs->{inout_type};
 
-                #$link_param{inout_type} = 'output_links';
-
                 if ($inputs->{is_param} eq 'yes') {
                     $in_links{is_param}         = 'yes';
                     $in_links{params}           = $inputs->{params};
@@ -1789,9 +1792,6 @@ sub reformat_links {
                 push @only_links,   \%out_links;
                 push @output_links, $outputs->{link_name};
 
-                # print "\n\nDebug ZZZ\n\n";
-                # say '$_->{link_name} . _ . $_->{inout_type}';
-                # say $_->{link_name} . '_' . $_->{inout_type};
                 $stages_with_types{$outputs->{link_name} . '_'
                       . $outputs->{inout_type}} = \%out_links;
             }
@@ -1807,11 +1807,6 @@ sub reformat_links {
     for (@only_links) {
         $cnt_links{$_->{link_name} . '_' . $_->{inout_type}}++;
     }
-
-    print "\n\nDebug stages_with_types\n\n";
-
-    # p %cnt_links;
-    p %stages_with_types;
     return \%out_hash;
 }
 
