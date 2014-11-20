@@ -1238,10 +1238,23 @@ sub fill_excel_stages_and_links {
 sub fill_excel_inout_links {
     my ($all, $col, $j, $stage) = @_;
     my ($max, $loc_max) = (0, 0, 0);
+    my @start_stages = ('copy', 'pxbridge');
+    my %start_stages_of = map { $_ => 1 } @start_stages;
+
+    # # $delta=(exists $start_stages_of{$stage->{operator_name}})?4:9;
+    # if (exists $start_stages_of{$stage->{operator_name}}) {    ### MIII
     for my $link (qw/input_links output_links/) {
-        $loc_max = pexcel_table_links($j, $col, $all, $stage->{$link}, $link);
+        if (!(  exists $start_stages_of{$stage->{operator_name}}
+                && $link eq 'input_links'
+            )
+          )
+        {
+            $loc_max =
+              pexcel_table_links($j, $col, $all, $stage->{$link}, $link);
+        
         $max = max($max, $loc_max);
         $col = $col + 5;
+		}
     }
     return ($max, $col);
 }
