@@ -1747,9 +1747,6 @@ sub reformat_links {
                 $in_links{operator_name} = $stage->{operator_name};
                 $in_links{stage_name}    = $stage->{stage_name};
                 $in_links{inout_type}    = $inputs->{inout_type};
-
-                #$link_param{inout_type} = 'output_links';
-
                 if ($inputs->{is_param} eq 'yes') {
                     $in_links{is_param}         = 'yes';
                     $in_links{params}           = $inputs->{params};
@@ -1782,10 +1779,6 @@ sub reformat_links {
                 }
                 push @only_links,   \%out_links;
                 push @output_links, $outputs->{link_name};
-
-                # print "\n\nDebug ZZZ\n\n";
-                # say '$_->{link_name} . _ . $_->{inout_type}';
-                # say $_->{link_name} . '_' . $_->{inout_type};
                 $stages_with_types{$outputs->{link_name} . '_'
                       . $outputs->{inout_type}} = \%out_links;
             }
@@ -1802,9 +1795,9 @@ sub reformat_links {
         $cnt_links{$_->{link_name} . '_' . $_->{inout_type}}++;
     }
 
+    print "\n\nDebug cnt_links\n\n";
+    p %cnt_links;
     print "\n\nDebug stages_with_types\n\n";
-
-    # p %cnt_links;
     p %stages_with_types;
     return \%out_hash;
 }
@@ -2023,17 +2016,10 @@ sub parse_in_links {
         $link_param{link_name}  = $+{link_name};
         $link_param{link_type}  = $+{link_fields};
         $link_param{inout_type} = 'input_links';
-
-        # 'input_links'
-
-        #$link_param{link_type} = $+{link_type};
         $link_param{trans_name} = $+{trans_name}
           if defined $+{trans_name};
         $link_param{is_param} = 'no';
         if (defined $+{link_fields})
-
-          #if ( length( $link_param{link_type} ) >= 6
-          #&& substr( $link_param{link_type}, 0, 6 ) eq 'modify' )
         {
             $link_param{is_param} = 'yes';
             $link_param{params}   = parse_fields($+{link_fields});
@@ -2043,13 +2029,7 @@ sub parse_in_links {
         }
         push @links, \%link_param;
     }
-
-    #print "\n\n Debug in_links!!! \n\n";
-    #p $body;
-
-    #p @links;
     return \@links;
-
 }
 
 sub parse_out_links {
