@@ -1595,18 +1595,28 @@ sub fill_excel_next_stage9 {
 
         my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
         for my $next_stage4 (@{$ref_next_stages4}) {
-            say "\nDebug_next_stage3\n";
-            say
-              "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            # say "\nDebug_next_stage3\n";
+            # say   "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
             ($max, $col) =
               fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
 			  
 			  	    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
 			    my $ref_next_stages4 =
-              get_next_stage_for_link($links, $next_stage3);
+              get_next_stage_for_link($links, $next_stage3);		  
+			  
+#проверяем, если в стейдже нет оутпут линков, то он последний			  
+     my $cnt_out_links = 0 + @{$next_stage4->{output_links}};
+       # if ($cnt_out_links!=0){
+	   
+	   say "\n\nDebug_next_stage3_mega\n";
+	   say "\n\n\$cnt_out_links=$cnt_out_links\n";
+	   p $next_stage4;
+	   say "\n\n============\n";
             ($max, $col, $curr_j) =
               fill_excel_next_stage10($col, $curr_j, $max, $links,
                 $next_stage3, $all, $ref_next_stages4);
+				# }
+				
 			#еонец строки	
         }
         $max = max($max, 5);
@@ -1616,9 +1626,56 @@ sub fill_excel_next_stage9 {
 }
 
 #
-# New subroutine "fill_excel_next_stage6" extracted - Fri Nov 21 13:46:53 2014.
+# New subroutine "fill_excel_next_stage9" extracted - Fri Nov 21 13:46:53 2014.
 #
 sub fill_excel_next_stage10 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            # say "\nDebug_next_stage3\n";
+            # say   "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			  	    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);		  
+			  
+#проверяем, если в стейдже нет оутпут линков, то он последний			  
+     my $cnt_out_links = 0 + @{$next_stage4->{output_links}};
+       # if ($cnt_out_links!=0){
+	   
+	   say "\n\nDebug_next_stage3_mega\n";
+	   say "\n\n\$cnt_out_links=$cnt_out_links\n";
+	   p $next_stage4;
+	   say "\n\n============\n";
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage11($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+				# }
+				
+			#конец строки	
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage11 extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage11 {
     my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
       @_;
 
