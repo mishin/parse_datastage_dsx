@@ -14,6 +14,7 @@ use Spreadsheet::WriteExcel;
 use Text::ASCIITable;
 use POSIX qw(strftime);
 use List::Util qw(first max maxstr min minstr reduce shuffle sum);
+use File::Slurp;
 
 use Data::Printer {
     output         => 'stdout',
@@ -52,6 +53,8 @@ sub enc_terminal {
 #
 # New subroutine "process_parameters_properties" extracted - Thu Oct 30 15:25:16 2014.
 #
+
+
 sub process_parameters_properties {
     my ($parameter_set_body, $PARAMETER_RX) = @_;
     while ($parameter_set_body =~ m/$PARAMETER_RX/g) {
@@ -1172,11 +1175,12 @@ sub pexcel_table_links {
     $j = $j + $q;
 
     # $j = show_stage_prop(
-  my $max = show_stage_prop(
+    my $max = show_stage_prop(
         $j, $col, $all, $stage->{$suffix},
         $all->{job_pop}->{only_links}->{stages_with_types},
         '_' . $suffix
     );
+
     # return $j;
     return $max;
 }
@@ -1204,6 +1208,7 @@ sub show_stage_prop {
 
     $col = $col + 4;
     $j   = $j;         # + 4 + $max;
+
     # return $j;
     return $max;
 }
@@ -1215,30 +1220,137 @@ sub fill_excel_stages_and_links {
     my ($all, $col, $j) = @_;
     my $links = $all->{job_pop}->{only_links}->{only_stages_and_links};
 
-	 my @start_stages = ('copy', 'pxbridge');
-     my %start_stages_of = map { $_ => 1 } @start_stages;
+    my @start_stages = ('copy', 'pxbridge');
+    my %start_stages_of = map { $_ => 1 } @start_stages;
 
+    my $max                    = 0;
+    my $orig_col               = $col;
+    my %is_stage_already_shown = ();
 
-    # for my $link (qw/input_links output_links/) {
-        # if (not exists $start_stages_of{$stage->{operator_name}}             && $link eq 'input_links')
-	
-    my $max = 0;
-	 my $orig_col=$col;
-	# my $save_col=0;
+    # my $save_col=0;
     for my $stage (@{$links}) {
-	 if (not exists $start_stages_of{$stage->{operator_name}}){
-        ($max, $col) = fill_excel_inout_links($all, $col, $j, $stage);
-		$col++;
-		print "\nDebug_max=$max in $stage->{stage_name}\n\n";
-		 }else{
-		 ($max, $col) = fill_excel_inout_links($all, $orig_col, $j+$max, $stage);
-		 $max=max($max,5);
-		 $j=$j+$max+10;
-		 }        
+
+#проверяем, что этот стейдж еще не выводили
+        if (not exists $is_stage_already_shown{$stage->{stage_name}}) {
+
+#проверяем, что стейдж входит в список тех, которые выводятся первыми ('copy', 'pxbridge') и инпут=0
+
+#число входящих линков
+            my $cnt_in_links = 0 + @{$stage->{input_links}};
+            if (exists $start_stages_of{$stage->{operator_name}}
+                && $cnt_in_links == 0)
+            {
+
+                #высота текущей стадии, стейджа
+                my $curr_j = $j + $max;
+                ($max, $col) =
+                  fill_excel_inout_links($all, $orig_col, $j + $max, $stage);
+                $max = max($max, 5);
+                $j = $j + $max + 10;
+
+                my ($max, $col) =
+                  fill_excel_next_stage($col, $curr_j, $max, $links, $all,
+                    $stage);
+
+
+                $is_stage_already_shown{$stage->{stage_name}}++;
+
+              # }
+              # else {
+              # ($max, $col) = fill_excel_inout_links($all, $col, $j, $stage);
+              # $col++;
+              # print "\nDebug_max=$max in $stage->{stage_name}\n\n";
+
+
+            }
+        }
     }
 
     $j = $j + 4 + $max;
     return $j;
+}
+
+#
+# New subroutine "fill_excel_next_stage" extracted - Fri Nov 21 11:19:14 2014.
+#
+sub fill_excel_next_stage {
+    my ($col, $curr_j, $max, $links, $all, $stage) = @_;
+
+#дальше правее должны пойти те стейджы (стадии, шаги, этапы по-русски)
+#у которых $input_links входит в @$output_links
+    my $ref_next_stages = get_next_stage_for_link($links, $stage);
+
+
+#выводим следующие по порядку стадии справа
+    for my $next_stage (@{$ref_next_stages}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $col, $curr_j, $next_stage);
+        $col++;
+
+        my $ref_next_stages2 = get_next_stage_for_link($links, $next_stage);
+
+		my $orig_col=$col;
+        for my $next_stage2 (@{$ref_next_stages2}) {
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col, $curr_j, $next_stage2);
+            #$col++;			
+	        $max = max($max, 5);
+            $curr_j = $curr_j + $max + 10;
+
+            # my $ref_next_stages = get_next_stage_for_link($links, $stage);
+        }
+		
+		        $max = max($max, 5);
+                $curr_j = $curr_j + $max + 10;
+
+#my ($max, $col) =  fill_excel_next_stage($col, $curr_j, $max, $links, $all, $stage);
+#ищем следующие после них
+# my $ref_next_stages2 = get_next_stage_for_link($links, $next_stage);
+    }
+    return ($max, $col);
+}
+
+#
+# New subroutine "get_next_stage" extracted - Thu Nov 21 10:27:27 2014.
+#
+sub get_next_stage_for_link {
+    my ($links, $stage) = @_;
+
+# input_links output_links
+# @{$stage->{$suffix}}
+    my $out_suffix = 'output_links';
+
+#массив стадий, которые идут сразу за нашей
+    my @next_stages = ();
+
+#Выводим все выходные линки из текущей стадии
+    for my $out_link_name (@{$stage->{$out_suffix}}) {
+
+        # say "\nDebug_bug_bug\n\n";
+        # say $out_link_name;
+
+#идем по всем стадиям
+        for my $loc_stage (@{$links}) {
+            my $in_suffix = 'input_links';
+
+#ищем входные линки совпадающие с нашим выходным
+            for my $in_link_name (@{$loc_stage->{$in_suffix}}) {
+                if ($out_link_name eq $in_link_name) {
+                    say "\nЛинки совпали, ура!!!\n\n";
+                    say
+                      "$out_link_name in $stage->{stage_name} eq $in_link_name in $loc_stage->{stage_name}";
+                    push @next_stages, $loc_stage;
+                }
+            }
+
+
+        }
+
+
+    }
+
+#возвращаем ссылку на массив стадий
+    return \@next_stages;
 }
 
 #
@@ -1247,33 +1359,37 @@ sub fill_excel_stages_and_links {
 sub fill_excel_inout_links {
     my ($all, $col, $j, $stage) = @_;
     my ($col_max, $loc_max) = (0, 0, 0);
- 
+
     pexcel_head($j + 6, $col, $all, 'stage_name');
     pexcel_row($j + 6, $col + 1, $all, $stage->{stage_name});
 
     pexcel_head($j + 7, $col, $all, 'operator_name');
     pexcel_row($j + 7, $col + 1, $all, $stage->{operator_name});
-	
+
     my @start_stages = ('copy', 'pxbridge');
     my %start_stages_of = map { $_ => 1 } @start_stages;
 
 
     for my $link (qw/input_links output_links/) {
-	print "\n\n\nDEbug\n\n";
-	say 0+@{$stage->{$link}};
-	p $link;
-	p $stage;
+        print "\n\n\nDEbug\n\n";
+        say 0 + @{$stage->{$link}};
+        p $link;
+        p $stage;
+
         #if (not exists $start_stages_of{$stage->{operator_name}}
         #    && $link eq 'input_links')
         #{
-		if (0+@{$stage->{$link}} >0){
+
+        #если число линков больше нуля
+        if (0 + @{$stage->{$link}} > 0) {
             $loc_max = pexcel_table_links($j + 9, $col, $all, $stage, $link);
             $col_max = max($col_max, $loc_max);
             $col = $col + 5;
-			}
+        }
+
         #}
     }
-    return ($col_max, $col);#,$j);
+    return ($col_max, $col);    #,$j);
 }
 
 #
@@ -1333,6 +1449,7 @@ sub fill_excel_activity_info {
     $curr_job->write($j + 8, $col, "invocation_id", $ref_formats->{heading});
     $curr_job->write($j + 9, $col, "activity_number",
         $ref_formats->{heading});
+
     for my $activity_element (@{$activity}) {
         $col++;
         $curr_job->write(
@@ -1507,12 +1624,12 @@ sub fill_excel_stages {
     my $j   = 1;
     my $col = 3;
 
-    $j = fill_excel_name_stages($ref_formats, $curr_job, $stages, $j);
+    # $j = fill_excel_name_stages($ref_formats, $curr_job, $stages, $j);
 
     $j = fill_excel_job_annotation_text($ref_formats, $curr_job,
         $ref_job_annotation_texts, $j);
 
-    $j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
+    # $j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
 
 #$j =      fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
 #$j =      fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
@@ -1703,39 +1820,6 @@ sub patch_dsx_for_prod {
     write_file($file_name . ".patched", $data);
 }
 
-sub read_file {
-    my ($filename) = @_;
-
-    open my $in, '<:encoding(UTF-8)', $filename
-      or die "Could not open '$filename' for reading $!";
-    local $/ = undef;
-    my $all = <$in>;
-    close $in;
-
-    return $all;
-}
-
-sub write_file {
-    my ($filename, $content) = @_;
-
-    open my $out, '>:encoding(UTF-8)', $filename
-      or die "Could not open '$filename' for writing $!";
-    print $out $content;
-    close $out;
-
-    return;
-}
-
-sub append_file {
-    my ($filename, $content) = @_;
-
-    open my $out, '>>:encoding(UTF-8)', $filename
-      or die "Could not open '$filename' for writing $!";
-    print $out $content;
-    close $out;
-
-    return;
-}
 
 sub reformat_links {
     my $parsed_dsx            = shift;
