@@ -1,24 +1,69 @@
-#! perl
+#!/usr/bin/perl
 use v5.10;
 
 use FindBin '$RealBin';
-use Datahub::Tools qw/read_file enc_terminal/;
 use utf8;
 use strict;
 use warnings;
 use Encode::Locale;
 use Text::ASCIITable;
 use Data::Printer {
-    output => 'stdout',
+    output         => 'stdout',
     hash_separator => ':  ',
     return_value   => 'pass',
-    #    caller_info    => 1,
 };
 
-enc_terminal();
+main();
 
-my ($file_name) = 'orchestrate_code_body.xml';
-my $data = read_file($file_name);
+sub main {
+    enc_terminal();
+    my $file_name  = 'orchestrate_code_body.xml';
+    my $data       = read_file($file_name);
+    my $parsed_dsx = parse_orchestrate_body($data);
+
+    #p $parsed_dsx;
+    my $only_links = reformat_links($parsed_dsx);
+
+    #    show_dsx_content( $parsed_dsx, $file_name );
+}
+
+sub reformat_links {
+    my $parsed_dsx = shift;
+
+    my @only_links = ();
+
+    foreach my $stage ( @{$parsed_dsx} ) {
+        if ( $stage->{ins}->{in} eq 'yes' ) {
+            for ( @{ $stage->{ins}->{inputs} } ) {
+                if ( $_->{is_param} eq 'yes' ) {
+                    my %in_links = ();
+                    $in_links{link_name}        = $_->{link_name};
+                    $in_links{params}           = $_->{params};
+                    $in_links{link_keep_fields} = $_->{link_keep_fields};
+                                    $in_links{trans_name} = $_->{trans_name};
+                    push @only_links, \%in_links;
+                }
+            }
+        }
+
+        if ( $stage->{ins}->{out} eq 'yes' ) {
+            for ( @{ $stage->{ins}->{outputs} } ) {
+                if ( $_->{is_param} eq 'yes' ) {
+                    my %out_links = ();
+                    $out_links{link_name}        = $_->{link_name};
+                    $out_links{params}           = $_->{params};
+                    $out_links{link_keep_fields} = $_->{link_keep_fields};
+                    $out_links{trans_name} = $_->{trans_name};
+                    push @only_links, \%out_links;
+                }
+            }
+
+        }
+
+    }
+
+     p @only_links;
+}
 
 sub make_regexp {
     my $operator_rx      = qr{\Q#### STAGE: \E(?<stage_name>\w+)};
@@ -38,63 +83,121 @@ sub make_regexp {
     return $ORCHESTRATE_BODY_RX;
 }
 
-my $parsed_dsx = start_parse($data);
-display_dsx_content($parsed_dsx);
+#
+# New subroutine "head_of_stage" extracted - Mon Nov 17 10:15:21 2014.
+#
+sub show_head_of_stage {
+    my ( $t, $i, $stage ) = @_;
 
-sub display_dsx_content {
-    my $parsed_dsx = shift;
+    my ( $in, $in_type, $out, $out_type ) = ( '', '', '', '' );
+    if ( $stage->{ins}->{in} eq 'yes' ) {
+        for ( @{ $stage->{ins}->{inputs} } ) {
+            $in = $in . $_->{link_name} . "\n";
+        }
+    }
+    if ( $stage->{ins}->{out} eq 'yes' ) {
+        for ( @{ $stage->{ins}->{outputs} } ) {
+            $out = $out . $_->{link_name} . "\n";
+        }
+    }
+    $t->addRow( $i, $stage->{stage_name}, $stage->{operator_name},
+        $in, '', '', '', '', $out, '', '', '', '' );
+    return $t;
+}
+
+#
+# New subroutine "show_in_fields" extracted - Mon Nov 17 10:20:07 2014.
+#
+sub show_in_fields {
+    my $t     = shift;
+    my $stage = shift;
+
+    if ( $stage->{ins}->{in} eq 'yes'
+        && ${ $stage->{ins}->{inputs} }[0]->{is_param} eq 'yes' )
+    {
+        $t->addRowLine();
+        my $j = 1;
+        for my $f ( @{ ${ $stage->{ins}->{inputs} }[0]->{params} } ) {
+            $t->addRow( '', '', '', '', $j, $f->{field_name}, $f->{field_type},
+                $f->{is_null}, '', '', '', '', '' );
+            $t->addRowLine();
+            $j++;
+        }
+    }
+
+    return $t;
+}
+
+#
+# New subroutine "show_out_fields" extracted - Mon Nov 17 10:20:53 2014.
+#
+sub show_out_fields {
+    my $t     = shift;
+    my $stage = shift;
+
+    if ( $stage->{ins}->{out} eq 'yes'
+        && ${ $stage->{ins}->{outputs} }[0]->{is_param} eq 'yes' )
+    {
+        $t->addRowLine();
+        my $y = 1;
+        for my $f ( @{ ${ $stage->{ins}->{outputs} }[0]->{params} } ) {
+            $t->addRow( '', '', '', '', '', '', '', '', '', $y,
+                $f->{field_name}, $f->{field_type}, $f->{is_null} );
+            $t->addRowLine();
+            $y++;
+        }
+    }
+    return $t;
+}
+
+#
+# New subroutine "display_main_header" extracted - Mon Nov 17 10:30:17 2014.
+#
+sub show_main_header {
+    my $file_name = shift;
 
     my $t = Text::ASCIITable->new(
         { headingText => 'Parsing ORCHESTRATE of ' . $file_name } );
-    $t->setCols( 'Id', 'stage_name', 'op_name', 'inputs', 'outputs','outs_body' );
+    $t->setCols(
+        'Id',      'stage_name', 'op_name',    'inputs',
+        'num',     'field_name', 'field_type', 'is_null',
+        'outputs', 'num',        'field_name', 'field_type',
+        'is_null'
+    );
+    return $t;
+}
+
+sub show_dsx_content {
+    my ( $parsed_dsx, $file_name ) = @_;
+
+    my $t = show_main_header($file_name);
+
     my $i = 1;
     foreach my $stage ( @{$parsed_dsx} ) {
-        if ( $stage->{operator_name} eq  'copy' && $stage->{stage_name} eq 'DWH_REESTRS_DS') {
-			
-            my ( $in, $out ) = ('','');
-            if ( $stage->{ins}->{in} eq 'yes' ) {
-				#p $stage->{ins}->{inputs};
-				for my $inputs (@{ $stage->{ins}->{inputs} }){
-				$in=$in.$inputs->{link_name}."\n";
-					}
-                #$in = join "\n", @{ $stage->{ins}->{inputs} };
-            }
 
-            if ( $stage->{ins}->{out} eq 'yes' ) {
-				#p $stage->{ins}->{outputs}; 
-                #$out = join "\n", @{ $stage->{ins}->{outputs} };
-                for my $inputs (@{ $stage->{ins}->{outputs} }){
-				$out=$out.$inputs->{link_name}."\n";
-					}
-            }
-            $t->addRow( $i, $stage->{stage_name}, $stage->{operator_name},
-                $in, $out, $stage->{ins}->{body});
-            $t->addRowLine();
+        # if ($stage->{stage_name} eq 'LJ108') {
 
-            $i++;
-        }
+        # p $stage;
+        $t = show_head_of_stage( $t, $i, $stage );
+        $t = show_in_fields( $t, $stage );
+        $t = show_out_fields( $t, $stage );
+
+        $t->addRowLine();
+        $i++;
+
+        # }
     }
     print $t;
 }
 
-sub start_parse {
+sub parse_orchestrate_body {
     my $data                = shift;
     my $ORCHESTRATE_BODY_RX = make_regexp();
     local $/ = '';
-    my $i          = 1;
     my @parsed_dsx = ();
     while ( $data =~ m/$ORCHESTRATE_BODY_RX/xsg ) {
-
-=pod
-print "\nSTART:\n";
-        p $+{stage_name};
-        p $+{operator_name};
-print "\nbody:\n";
-        p $+{stage_body};
-=cut
-
         my %stage = ();
-        my $ins   = process_stage_body( $+{stage_body} );
+        my $ins   = parse_stage_body( $+{stage_body} );
         $stage{ins}           = $ins;
         $stage{stage_name}    = $+{stage_name};
         $stage{operator_name} = $+{operator_name};
@@ -103,64 +206,221 @@ print "\nbody:\n";
     return \@parsed_dsx;
 }
 
-sub process_stage_body {
+sub parse_stage_body {
     my ($stage_body) = @_;
     my %outs;
-    my $inputs_rx  = qr{## Inputs\n(?<inputs_name>.*?)(?:#|^;$)}sm;
-    my $outputs_rx = qr{## Outputs\n(?<outputs_name>.*?)^;$}sm;
+    my $inputs_rx  = qr{## Inputs\n(?<inputs_body>.*?)(?:#|^;$)}sm;
+    my $outputs_rx = qr{## Outputs\n(?<outputs_body>.*?)^;$}sm;
 
     my ( $inputs, $outputs ) = ( '', '' );
-    $outs{in}  = 'no';
-    $outs{out} = 'no';
+    $outs{in}   = 'no';
+    $outs{out}  = 'no';
     $outs{body} = $stage_body;
-    
     if ( $stage_body =~ $inputs_rx ) {
-        $outs{inputs} = get_inout_links( $+{inputs_name} );
+        $outs{inputs} = parse_out_links( $+{inputs_body} );
         $outs{in}     = 'yes';
     }
     if ( $stage_body =~ $outputs_rx ) {
-        $outs{outputs} = get_inout_links( $+{outputs_name} );
+        $outs{outputs} = parse_in_links( $+{outputs_body} );
         $outs{out}     = 'yes';
     }
     return \%outs;
 }
 
-sub get_inout_links {
+sub parse_in_links {
     my ($body) = @_;
-    #say "\ndebug";
-    #p $body;
-    my @links  = ();
-    my $link   = qr{
-                   '
-                   (?<link_name>
-					 \w+:
-					 \w+
-					 .v)
+    my @links = ();
+
+    my $link = qr{\d+
+    (?:<|>)
+    (?:\||)
+    \s
+         \[
+        (?<link_type>
+        (?:
+        modify\s\(
+          (?:
+         (?<link_fields>
+         .*?;|.*?
+         )
+         )\n
+         keep
+         (?<link_keep_fields>
+         .*?
+         )
+         ;
+         .*?
+          \)
+         )
+	     |.*
+	     )
+         \]
+                   \s 
+         '
+         (?:
+         			 (?<trans_name>\w+):
+					 (?<link_name>\w+)
+					 .v
+		 
 					 |
 					 \[.*?\]			 
-					 (?<link_name>
+		(?<link_name>
 					 \w+.ds
-					 )' 
+		)
+		)' 
 		      }xs;
-		      #my $link   = qr{
-              #     '
-			#		 \w+:
-			#		 (?<link_name>\w+)
-			#		 .v
-			#		 |
-			#		 \[.*?\]
-			#		 (?<link_name>\w+.ds)
-			#		 ' 
-		     # }xs;
+
     while ( $body =~ m/$link/g ) {
-		my %link_param=();
-		$link_param{link_name}=$+{link_name};
-		$link_param{link_type}=$+{link_type};		
+        my %link_param = ();
+        $link_param{link_name} = $+{link_name};
+        $link_param{link_type} = $+{link_fields};
+
+        #$link_param{link_type} = $+{link_type};
+        $link_param{trans_name} = $+{trans_name} if defined $+{trans_name};
+        $link_param{is_param} = 'no';
+        if ( defined $+{link_fields} )
+
+          #if ( length( $link_param{link_type} ) >= 6
+          #&& substr( $link_param{link_type}, 0, 6 ) eq 'modify' )
+        {
+            $link_param{is_param} = 'yes';
+            $link_param{params}   = parse_fields( $+{link_fields} );
+            $link_param{link_keep_fields} =
+              parse_keep_fields( $+{link_keep_fields} )
+              if defined $+{link_keep_fields};
+        }
         push @links, \%link_param;
     }
+
+    #p @links;
     return \@links;
 
 }
 
+sub parse_out_links {
+    my ($body) = @_;
+    my @links = ();
+
+    my $link = qr{\d+
+    (?:<|>)
+    (?:\||)
+    \s
+         \[
+        (?<link_type>
+        (?:
+        modify\s\(
+          (?:
+         (?<link_fields>
+         .*?;|.*?
+         )
+         )\n
+         keep
+         (?<link_keep_fields>
+         .*?
+         )
+         ;
+         .*?
+          \)
+         )
+	     |.*
+	     )
+         \]
+                   \s 
+         '
+         (?:
+         			 (?<trans_name>\w+):
+					 (?<link_name>\w+)
+					 .v
+		 
+					 |
+					 \[.*?\]			 
+		(?<link_name>
+					 \w+.ds
+		)
+		)' 
+		      }xs;
+
+    while ( $body =~ m/$link/g ) {
+        my %link_param = ();
+        $link_param{link_name} = $+{link_name};
+        $link_param{link_type} = $+{link_fields};
+
+        #$link_param{link_type} = $+{link_type};
+        $link_param{trans_name} = $+{trans_name} if defined $+{trans_name};
+        $link_param{is_param} = 'no';
+        if ( defined $+{link_fields} )
+
+          #if ( length( $link_param{link_type} ) >= 6
+          #&& substr( $link_param{link_type}, 0, 6 ) eq 'modify' )
+        {
+            $link_param{is_param} = 'yes';
+            $link_param{params}   = parse_fields( $+{link_fields} );
+            $link_param{link_keep_fields} =
+              parse_keep_fields( $+{link_keep_fields} )
+              if defined $+{link_keep_fields};
+        }
+        push @links, \%link_param;
+    }
+
+    #p @links;
+    return \@links;
+
+}
+
+sub parse_keep_fields {
+    my $body_for_keep_fields = shift;
+    $body_for_keep_fields =~ s/^\s+|\s+$//g;
+
+    #p $body_for_keep_fields;
+    my @fields = split /\s*,\s*/s, $body_for_keep_fields;
+    return \@fields;
+}
+
+sub parse_fields {
+    my $body_for_fields = shift;
+
+    #p $body_for_fields;
+    my @fields = ();
+    my $field  = qr{
+    (?<field_name>\w+)
+    :
+    (?<is_null>not_nullable|nullable)\s
+    (?<field_type>.*?)
+    =
+    \g{field_name}
+    ;
+     }xs;
+
+    while ( $body_for_fields =~ m/$field/g ) {
+        my %field_param = ();
+        $field_param{field_name} = $+{field_name};
+        $field_param{is_null}    = $+{is_null};
+        $field_param{field_type} = $+{field_type};
+        push @fields, \%field_param;
+    }
+    return \@fields;
+
+}
+
+sub enc_terminal {
+
+    if (-t) {
+        binmode( STDIN,  ":encoding(console_in)" );
+        binmode( STDOUT, ":encoding(console_out)" );
+        binmode( STDERR, ":encoding(console_out)" );
+    }
+}
+
+sub read_file {
+    my ($filename) = @_;
+
+    open my $in, '<:encoding(UTF-8)', $filename
+      or die "Could not open '$filename' for reading $!";
+    local $/ = undef;
+    my $all = <$in>;
+    close $in;
+
+    return $all;
+}
 __DATA__
   

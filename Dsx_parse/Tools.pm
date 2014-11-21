@@ -14,6 +14,7 @@ use Spreadsheet::WriteExcel;
 use Text::ASCIITable;
 use POSIX qw(strftime);
 use List::Util qw(first max maxstr min minstr reduce shuffle sum);
+use File::Slurp;
 
 use Data::Printer {
     output         => 'stdout',
@@ -39,6 +40,7 @@ use Sub::Exporter -setup => {
     ],
 };
 
+
 sub enc_terminal {
 
     if (-t) {
@@ -51,6 +53,8 @@ sub enc_terminal {
 #
 # New subroutine "process_parameters_properties" extracted - Thu Oct 30 15:25:16 2014.
 #
+
+
 sub process_parameters_properties {
     my ($parameter_set_body, $PARAMETER_RX) = @_;
     while ($parameter_set_body =~ m/$PARAMETER_RX/g) {
@@ -397,8 +401,9 @@ sub process_stage {
           process_orchestrate_code_properties($+{orchestrate_code_body},
             $COMPILE_RX_REF->{ORCHESTRATE_CODE_RX});
         my $parsed_dsx = parse_orchestrate_body($+{orchestrate_code_body});
-        print "\nDebug_orig\n\n";
-        p $parsed_dsx;
+
+        # print "\nDebug_orig\n\n";
+        # p $parsed_dsx;
         $only_links = reformat_links($parsed_dsx);
 
         #show_dsx_content( $parsed_dsx, $file_name );
@@ -1159,35 +1164,33 @@ sub pexcel_table_fields {
     return $q;
 }
 
-
 sub pexcel_table_links {
-    my ($j, $col, $all, $ref_array, $suffix) = @_;
+    my ($j, $col, $all, $stage, $suffix) = @_;
     pexcel_head($j, $col, $all, $suffix);
     my $q = 1;
-    for my $single_field (@{$ref_array}) {
+    for my $single_field (@{$stage->{$suffix}}) {
         pexcel_row($j + $q, $col, $all, $single_field);
         $q++;
     }
     $j = $j + $q;
 
-    $j = show_stage_prop(
-        $j, $col, $all, $ref_array,
+    # $j = show_stage_prop(
+    my $max = show_stage_prop(
+        $j, $col, $all, $stage->{$suffix},
         $all->{job_pop}->{only_links}->{stages_with_types},
         '_' . $suffix
     );
-    return $j;
+
+    # return $j;
+    return $max;
 }
 
 
 sub show_stage_prop {
     my ($j, $col, $all, $input_links, $ref_stages_with_types, $suffix) = @_;
-    print "\nDebug say \$link_name; \n\n";
-
-    # $col--;
     my $max = 0;
     for my $link_name (@{$input_links}) {
         my $lname = $link_name . $suffix;    #'_input_links';
-
 
         pexcel_head($j + 2, $col,     $all, 'field_name');
         pexcel_head($j + 2, $col + 1, $all, 'field_type');
@@ -1205,7 +1208,9 @@ sub show_stage_prop {
 
     $col = $col + 4;
     $j   = $j;         # + 4 + $max;
-    return $j;
+
+    # return $j;
+    return $max;
 }
 
 #
@@ -1213,44 +1218,568 @@ sub show_stage_prop {
 #
 sub fill_excel_stages_and_links {
     my ($all, $col, $j) = @_;
-    my ($links, $ref_stages_with_types, $ref_formats, $curr_job, $job_pop) = (
-        $all->{job_pop}->{only_links}->{only_stages_and_links},
-        $all->{job_pop}->{only_links}->{stages_with_types},
-        $all->{ref_formats},
-        $all->{curr_job},
-        $all->{job_pop}
-    );
-    pexcel_head($j + 6, $col, $all, 'stage_name');
-    pexcel_head($j + 7, $col, $all, 'operator_name');
-    my ($max, $max_input, $max_output) = (0, 0, 0);
+    my $links = $all->{job_pop}->{only_links}->{only_stages_and_links};
+
+    my @start_stages = ('copy', 'pxbridge');
+    my %start_stages_of = map { $_ => 1 } @start_stages;
+
+    my $max      = 0;
+    my $orig_col = $col;
+
+#сюда кладем те стадии, которые уже выводились в excel
+# my %painted = ();
+
+    # my $save_col=0;
     for my $stage (@{$links}) {
-        $col++;
-        pexcel_row($j + 6, $col, $all, $stage->{stage_name});
-        pexcel_row($j + 7, $col, $all, $stage->{operator_name});
 
-        if ($stage->{operator_name} eq 'copy') {
-            $max_output =
-              pexcel_table_links($j + 9, $col, $all, $stage->{output_links},
-                'output_links');
-            $col = $col + 4;
+#проверяем, что этот стейдж еще не выводили
+        # if (!$painted{$stage->{stage_name}}) {
+
+#проверяем, что стейдж входит в список тех, которые выводятся первыми ('copy', 'pxbridge') и инпут=0
+
+#число входящих линков
+        my $cnt_in_links = 0 + @{$stage->{input_links}};
+        if (   exists $start_stages_of{$stage->{operator_name}}
+            && $cnt_in_links == 0
+            && $stage->{stage_name} eq 'IP')
+        {
+
+            #высота текущей стадии, стейджа
+            my $curr_j = $j + $max;
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col, $j + $max, $stage);
+            $max = max($max, 5);
+            $j = $j + $max + 10;
+
+            # $painted{$stage->{stage_name}}++;
+
+            # say "\nDebug_names1\n";
+            # p %painted;
+            my ($max, $col) =
+              fill_excel_next_stage($col, $curr_j, $max, $links, $all,
+                $stage);
+
+
+            # }
+            # else {
+            # ($max, $col) = fill_excel_inout_links($all, $col, $j, $stage);
+            # $col++;
+            # print "\nDebug_max=$max in $stage->{stage_name}\n\n";
+
+
         }
-        else {
-            $max_input =
-              pexcel_table_links($j + 9, $col, $all, $stage->{input_links},
-                'input_links');
-            $max_output =
-              pexcel_table_links($j + 9, $col + 5, $all,
-                $stage->{output_links},
-                'output_links');
-            $col = $col + 9;
-        }
 
-        $max = max($max, $max_input, $max_output);
-
+        # }
     }
 
     $j = $j + 4 + $max;
     return $j;
+}
+
+#
+# New subroutine "fill_excel_next_stage" extracted - Fri Nov 21 11:19:14 2014.
+#
+sub fill_excel_next_stage {
+    my ($col, $curr_j, $max, $links, $all, $stage) = @_;
+
+#дальше правее должны пойти те стейджы (стадии, шаги, этапы по-русски)
+#у которых $input_links входит в @$output_links
+    my $ref_next_stages = get_next_stage_for_link($links, $stage);
+
+
+    # say "\n\nDebug_names_stages\n";
+    # p $is_stage_already_shown;
+#выводим следующие по порядку стадии справа
+    for my $next_stage (@{$ref_next_stages}) {
+
+        ($max, $col) =
+          fill_excel_inout_links($all, $col, $curr_j, $next_stage);
+        $col++;
+
+        my $ref_next_stages2 = get_next_stage_for_link($links, $next_stage);
+
+        my $orig_col = $col;
+        for my $next_stage2 (@{$ref_next_stages2}) {
+
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col, $curr_j, $next_stage2);
+
+            # $painted->{$stage->{stage_name}}++;
+
+
+            my $ref_next_stages3 =
+              get_next_stage_for_link($links, $next_stage2);
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage2($col, $curr_j, $max, $links,
+                $next_stage2, $all, $ref_next_stages3,);
+
+
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+
+    }
+    return ($max, $col);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage2" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage2 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+               ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+            my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage3($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage3" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage3 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            say "\nDebug_next_stage3\n";
+            say
+              "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			  #эта строчка повторяется везде!!!
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage4($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+			#еонец строки	
+				
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage4" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage4 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            say "\nDebug_next_stage3\n";
+            say
+              "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage5($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+			#еонец строки	
+			  
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage5" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage5 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            say "\nDebug_next_stage3\n";
+            say
+              "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			  	    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage6($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+			#еонец строки	
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage6" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage6 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            say "\nDebug_next_stage3\n";
+            say
+              "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			  	    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage7($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+			#еонец строки	
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage7" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage7 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            say "\nDebug_next_stage3\n";
+            say
+              "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			  	    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage8($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+			#еонец строки	
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage8" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage8 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            say "\nDebug_next_stage3\n";
+            say
+              "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			  	    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage9($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+			#еонец строки	
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage9" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage9 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            # say "\nDebug_next_stage3\n";
+            # say   "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			  	    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);		  
+			  
+#проверяем, если в стейдже нет оутпут линков, то он последний			  
+     my $cnt_out_links = 0 + @{$next_stage4->{output_links}};
+       # if ($cnt_out_links!=0){
+	   
+	   say "\n\nDebug_next_stage3_mega\n";
+	   say "\n\n\$cnt_out_links=$cnt_out_links\n";
+	   p $next_stage4;
+	   say "\n\n============\n";
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage10($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+				# }
+				
+			#еонец строки	
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+#
+# New subroutine "fill_excel_next_stage9" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage10 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            # say "\nDebug_next_stage3\n";
+            # say   "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+			  
+			  	    #эта строчка повторяется везде!!! fill_excel_next_stage4 меняем на fill_excel_next_stage5
+			    my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);		  
+			  
+#проверяем, если в стейдже нет оутпут линков, то он последний			  
+     my $cnt_out_links = 0 + @{$next_stage4->{output_links}};
+       # if ($cnt_out_links!=0){
+	   
+	   say "\n\nDebug_next_stage3_mega\n";
+	   say "\n\n\$cnt_out_links=$cnt_out_links\n";
+	   p $next_stage4;
+	   say "\n\n============\n";
+            ($max, $col, $curr_j) =
+              fill_excel_next_stage11($col, $curr_j, $max, $links,
+                $next_stage3, $all, $ref_next_stages4);
+				# }
+				
+			#конец строки	
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage11 extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage11 {
+    my ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3) =
+      @_;
+
+    my $orig_col2 = $col;
+
+    for my $next_stage3 (@{$ref_next_stages3}) {
+        ($max, $col) =
+          fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+
+
+        my $ref_next_stages4 = get_next_stage_for_link($links, $next_stage3);
+        for my $next_stage4 (@{$ref_next_stages4}) {
+            say "\nDebug_next_stage3\n";
+            say
+              "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+            ($max, $col) =
+              fill_excel_inout_links($all, $orig_col2, $curr_j, $next_stage3);
+        }
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
+    }
+    return ($max, $col, $curr_j);
+}
+
+
+#sub fill_excel_next_stage2 {}
+#
+# New subroutine "get_next_stage" extracted - Thu Nov 21 10:27:27 2014.
+#
+sub get_next_stage_for_link {
+    my ($links, $stage) = @_;
+
+# input_links output_links
+# @{$stage->{$suffix}}
+    my $out_suffix = 'output_links';
+
+#массив стадий, которые идут сразу за нашей
+    my @next_stages = ();
+
+#Выводим все выходные линки из текущей стадии
+    for my $out_link_name (@{$stage->{$out_suffix}}) {
+
+        # say "\nDebug_bug_bug\n\n";
+        # say $out_link_name;
+
+#идем по всем стадиям
+        for my $loc_stage (@{$links}) {
+            my $in_suffix = 'input_links';
+
+#ищем входные линки совпадающие с нашим выходным
+            for my $in_link_name (@{$loc_stage->{$in_suffix}}) {
+                if ($out_link_name eq $in_link_name) {
+                    say "\nЛинки совпали, ура!!!\n\n";
+                    say
+                      "$out_link_name in $stage->{stage_name} eq $in_link_name in $loc_stage->{stage_name}";
+                    push @next_stages, $loc_stage;
+                }
+            }
+
+
+        }
+
+
+    }
+
+#возвращаем ссылку на массив стадий
+    return \@next_stages;
+}
+
+#
+# New subroutine "fill_excel_inout_links" extracted - Thu Nov 20 15:27:27 2014.
+#
+sub fill_excel_inout_links {
+    my ($all, $col, $j, $stage) = @_;
+    my ($col_max, $loc_max) = (0, 0, 0);
+
+    pexcel_head($j + 6, $col, $all, 'stage_name');
+    pexcel_row($j + 6, $col + 1, $all, $stage->{stage_name});
+
+    pexcel_head($j + 7, $col, $all, 'operator_name');
+    pexcel_row($j + 7, $col + 1, $all, $stage->{operator_name});
+
+    my @start_stages = ('copy', 'pxbridge');
+    my %start_stages_of = map { $_ => 1 } @start_stages;
+
+
+    for my $link (qw/input_links output_links/) {
+        print "\n\n\nDEbug\n\n";
+        say 0 + @{$stage->{$link}};
+        p $link;
+        p $stage;
+
+        #если число линков больше нуля
+        if (0 + @{$stage->{$link}} > 0) {
+            $loc_max = pexcel_table_links($j + 9, $col, $all, $stage, $link);
+            $col_max = max($col_max, $loc_max);
+
+            # $col = $col + 5;
+            $col = $col + 4;
+        }
+
+        #}
+    }
+    return ($col_max, $col);    #,$j);
 }
 
 #
@@ -1310,6 +1839,7 @@ sub fill_excel_activity_info {
     $curr_job->write($j + 8, $col, "invocation_id", $ref_formats->{heading});
     $curr_job->write($j + 9, $col, "activity_number",
         $ref_formats->{heading});
+
     for my $activity_element (@{$activity}) {
         $col++;
         $curr_job->write(
@@ -1484,14 +2014,15 @@ sub fill_excel_stages {
     my $j   = 1;
     my $col = 3;
 
-    # $j = fill_excel_name_stages( $ref_formats, $curr_job, $stages, $j );
+    # $j = fill_excel_name_stages($ref_formats, $curr_job, $stages, $j);
 
     $j = fill_excel_job_annotation_text($ref_formats, $curr_job,
         $ref_job_annotation_texts, $j);
 
-#$j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
+    # $j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
+
 #$j =      fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
-#$j =       fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
+#$j =      fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
 #$j =      fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
 #$j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
 
@@ -1665,19 +2196,6 @@ sub patch_dsx_for_prod {
     my ($file_name) = @_;
     my $data = read_file($file_name);
 
-# my $match_exactly='\(412)\(41D)\(418)\(41C)\(410)\(41D)\(418)\(415)!!';
-# $data =~ s/BEGIN DSRECORD.*AnnotationText "\Q${match_exactly}\E.*END DSRECORD//gs;
-# $data =~ s/BEGIN DSRECORD.*AnnotationText*END DSRECORD//mxs;
-#remove_red_box
-
-=pod	
-	$data =~ s/(.*)(BEGIN DSRECORD
-      Identifier "V132A0".*AnnotationText "\\\(412\)\\\(41D\)\\\(418\)\\\(41C\)\\\(410\)\\\(41D\)\\\(418\)\\\(415\)!!.*END DSRECORD)(
-(?=   BEGIN DSRECORD
-      Identifier "V133S0").*)/$1$3/s;
-=cut	  
-
-    #return LOADING_DT
     $data =~ s/\QBEGIN DSSUBRECORD
          Name "LOADING_DT"
          Description "\"2011-12-12\""
@@ -1692,39 +2210,6 @@ sub patch_dsx_for_prod {
     write_file($file_name . ".patched", $data);
 }
 
-sub read_file {
-    my ($filename) = @_;
-
-    open my $in, '<:encoding(UTF-8)', $filename
-      or die "Could not open '$filename' for reading $!";
-    local $/ = undef;
-    my $all = <$in>;
-    close $in;
-
-    return $all;
-}
-
-sub write_file {
-    my ($filename, $content) = @_;
-
-    open my $out, '>:encoding(UTF-8)', $filename
-      or die "Could not open '$filename' for writing $!";
-    print $out $content;
-    close $out;
-
-    return;
-}
-
-sub append_file {
-    my ($filename, $content) = @_;
-
-    open my $out, '>>:encoding(UTF-8)', $filename
-      or die "Could not open '$filename' for writing $!";
-    print $out $content;
-    close $out;
-
-    return;
-}
 
 sub reformat_links {
     my $parsed_dsx            = shift;
@@ -1747,6 +2232,10 @@ sub reformat_links {
                 $in_links{operator_name} = $stage->{operator_name};
                 $in_links{stage_name}    = $stage->{stage_name};
                 $in_links{inout_type}    = $inputs->{inout_type};
+<<<<<<< HEAD
+=======
+
+>>>>>>> b7583a063058e0766f7053b9fce30a54dcccdfe9
                 if ($inputs->{is_param} eq 'yes') {
                     $in_links{is_param}         = 'yes';
                     $in_links{params}           = $inputs->{params};
@@ -1779,6 +2268,10 @@ sub reformat_links {
                 }
                 push @only_links,   \%out_links;
                 push @output_links, $outputs->{link_name};
+<<<<<<< HEAD
+=======
+
+>>>>>>> b7583a063058e0766f7053b9fce30a54dcccdfe9
                 $stages_with_types{$outputs->{link_name} . '_'
                       . $outputs->{inout_type}} = \%out_links;
             }
@@ -1794,11 +2287,14 @@ sub reformat_links {
     for (@only_links) {
         $cnt_links{$_->{link_name} . '_' . $_->{inout_type}}++;
     }
+<<<<<<< HEAD
 
     print "\n\nDebug cnt_links\n\n";
     p %cnt_links;
     print "\n\nDebug stages_with_types\n\n";
     p %stages_with_types;
+=======
+>>>>>>> b7583a063058e0766f7053b9fce30a54dcccdfe9
     return \%out_hash;
 }
 
