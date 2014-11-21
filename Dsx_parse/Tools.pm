@@ -55,6 +55,7 @@ sub enc_terminal {
 #
 
 
+
 sub process_parameters_properties {
     my ($parameter_set_body, $PARAMETER_RX) = @_;
     while ($parameter_set_body =~ m/$PARAMETER_RX/g) {
@@ -1237,8 +1238,9 @@ sub fill_excel_stages_and_links {
 
 #число входящих линков
             my $cnt_in_links = 0 + @{$stage->{input_links}};
-            if (exists $start_stages_of{$stage->{operator_name}}
-                && $cnt_in_links == 0)
+            if (   exists $start_stages_of{$stage->{operator_name}}
+                && $cnt_in_links == 0
+                && $stage->{stage_name} eq 'IP')
             {
 
                 #высота текущей стадии, стейджа
@@ -1280,7 +1282,6 @@ sub fill_excel_next_stage {
 #у которых $input_links входит в @$output_links
     my $ref_next_stages = get_next_stage_for_link($links, $stage);
 
-
 #выводим следующие по порядку стадии справа
     for my $next_stage (@{$ref_next_stages}) {
         ($max, $col) =
@@ -1289,27 +1290,98 @@ sub fill_excel_next_stage {
 
         my $ref_next_stages2 = get_next_stage_for_link($links, $next_stage);
 
-		my $orig_col=$col;
+        my $orig_col = $col;
         for my $next_stage2 (@{$ref_next_stages2}) {
+
             ($max, $col) =
               fill_excel_inout_links($all, $orig_col, $curr_j, $next_stage2);
-            #$col++;			
-	        $max = max($max, 5);
-            $curr_j = $curr_j + $max + 10;
 
-            # my $ref_next_stages = get_next_stage_for_link($links, $stage);
+            my $ref_next_stages3 =
+              get_next_stage_for_link($links, $next_stage2);
+($max, $col,$curr_j) = fill_excel_next_stage2 ($col, $curr_j, $max, $links, $next_stage2, $all, $ref_next_stages3);
+
         }
-		
-		        $max = max($max, 5);
-                $curr_j = $curr_j + $max + 10;
-
-#my ($max, $col) =  fill_excel_next_stage($col, $curr_j, $max, $links, $all, $stage);
-#ищем следующие после них
-# my $ref_next_stages2 = get_next_stage_for_link($links, $next_stage);
+        $max = max($max, 5);
+        $curr_j = $curr_j + $max + 10;
     }
     return ($max, $col);
 }
 
+
+#
+# New subroutine "fill_excel_next_stage2" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage2 {
+    my ($col,$curr_j, $max,$links,$next_stage2 ,$all ,$ref_next_stages3) = @_;
+	
+	my $orig_col2 = $col;
+
+            for my $next_stage3 (@{$ref_next_stages3}) {
+                say "\nDebug_next_stage3\n";
+                say
+                  "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+                ($max, $col) =
+                  fill_excel_inout_links($all, $orig_col2, $curr_j,
+                    $next_stage3);
+
+
+                my $ref_next_stages4 =
+                  get_next_stage_for_link($links, $next_stage3);
+                for my $next_stage4 (@{$ref_next_stages4}) {
+                    say "\nDebug_next_stage3\n";
+                    say
+                      "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+                    ($max, $col) =
+                      fill_excel_inout_links($all, $orig_col2, $curr_j,
+                        $next_stage3);
+						
+						      my $ref_next_stages4 =
+              get_next_stage_for_link($links, $next_stage3);
+						($max, $col,$curr_j) = fill_excel_next_stage3 ($col, $curr_j, $max, $links, $next_stage3, $all, $ref_next_stages4);
+                }
+                $max = max($max, 5);
+                $curr_j = $curr_j + $max + 10;
+            }
+    return ($max, $col,$curr_j);
+}
+
+
+
+#
+# New subroutine "fill_excel_next_stage3" extracted - Fri Nov 21 13:46:53 2014.
+#
+sub fill_excel_next_stage3 {
+    my ($col,$curr_j, $max,$links,$next_stage2 ,$all ,$ref_next_stages3) = @_;
+	
+	my $orig_col2 = $col;
+
+            for my $next_stage3 (@{$ref_next_stages3}) {
+                say "\nDebug_next_stage3\n";
+                say
+                  "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+                ($max, $col) =
+                  fill_excel_inout_links($all, $orig_col2, $curr_j,
+                    $next_stage3);
+
+
+                my $ref_next_stages4 =
+                  get_next_stage_for_link($links, $next_stage3);
+                for my $next_stage4 (@{$ref_next_stages4}) {
+                    say "\nDebug_next_stage3\n";
+                    say
+                      "$next_stage2->{stage_name} parent of $next_stage3->{stage_name}";
+                    ($max, $col) =
+                      fill_excel_inout_links($all, $orig_col2, $curr_j,
+                        $next_stage3);
+                }
+                $max = max($max, 5);
+                $curr_j = $curr_j + $max + 10;
+            }
+    return ($max, $col,$curr_j);
+}
+
+
+#sub fill_excel_next_stage2 {}
 #
 # New subroutine "get_next_stage" extracted - Thu Nov 21 10:27:27 2014.
 #
