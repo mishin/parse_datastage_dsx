@@ -25,3 +25,7 @@ _doc/
 *.*~
 *.xls
 *.xml
+*.dsx
+*.log
+Datahub/Tools.pm
+Dsx_parse/Tools.pm.refactor
