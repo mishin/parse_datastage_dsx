@@ -17,3 +17,11 @@ nytprof.out
 /pm_to_blib
 *.o
 *.bs
+*.tmp
+*.bak
+_old_versions/
+_doc/
+.DS_Store
+*.*~
+*.xls
+*.xml
