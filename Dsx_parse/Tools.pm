@@ -19,7 +19,7 @@ use Data::Printer {
     hash_separator => ': ',
     return_value   => 'pass',
 };
-use Data::TreeDumper ;
+use Data::TreeDumper;
 use version; our $VERSION = qv('0.0.1');
 use Sub::Exporter -setup => {
     exports => [
@@ -1128,21 +1128,6 @@ sub fill_excel_stages_and_links {
     my $max             = 0;
     my $orig_col        = $col;
 
- #-------------------------------------------------------------------
-# package setup data
-#-------------------------------------------------------------------
-
-         #$Data::TreeDumper::Useascii = 0 ;
-         #$Data::TreeDumper::Maxdepth = 2 ;
- $Data::TreeDumper::Displaycallerlocation=1;
-
-         print DumpTree($all, 'all') ;
-         print DumpTree($col, 'col') ;
-         print DumpTree($j, 'j') ;
-         print DumpTree($direction, 'direction') ;
-         
-
-
 #сюда кладем те стадии, которые уже выводились в excel
 # my %painted = ();
 # my $save_col=0;
@@ -1152,19 +1137,42 @@ sub fill_excel_stages_and_links {
 # if (!$painted{$stage->{stage_name}}) {
 #проверяем, что стейдж входит в список тех, которые выводятся первыми ('copy', 'pxbridge') и инпут=0
 #число входящих линков
-        my $cnt_in_links = 0;
-        if ( $direction eq 'start' ) {
-            $cnt_in_links = 0 + @{ $stage->{input_links} };
-        }
-        elsif ( $direction eq 'end' ) {
-            $cnt_in_links = 0 + @{ $stage->{output_links} };
-        }
-        if (
-            exists $start_stages_of{ $stage->{operator_name} }
-            && $cnt_in_links == 0
+        print DumpTree( $stage->{stage_name},   '$stage->{stage_name}' );
+        print DumpTree( $stage->{input_links},  '$stage->{input_links}' );
+        print DumpTree( $stage->{output_links}, '$stage->{output_links}' );
 
-            #&& $stage->{stage_name} eq 'IP'
-          )
+        # p $stage->{input_links}
+        # p $stage->{output_links}
+        my $is_dataset = 'no';
+        my $links_name =
+          ( $direction eq 'start' ) ? 'input_links' : 'output_links';
+        my $cnt_links = 0;
+
+        # if ( $direction eq 'start' ) {
+        $cnt_links = 0 + @{ $stage->{$links_name} };
+        if ( $cnt_links == 1
+            && substr( ${ $stage->{$links_name} }[0], -2 ) eq 'ds' )
+        {
+            $is_dataset = 'yes';
+
+            # say "this is ds:".${$stage->{$links_name}}[0];
+            # say "this is ds:".substr(${$stage->{$links_name}}[0],-2);
+            # say "this is ds:".substr(${$stage->{output_links}}[0],-2);
+        }
+
+        # }
+        # elsif ( $direction eq 'end' ) {
+        # $cnt_out_links = 0 + @{ $stage->{output_links} };
+
+        # if ($cnt_in_links==1){
+        # say "this is ds:".substr(${$stage->{output_links}}[0],-2);
+        # }
+        # }
+        # $cnt_links=max($cnt_in_links,$cnt_out_links);
+
+        #также, если стейдж типа ds
+        if ( ( $start_stages_of{ $stage->{operator_name} } && $cnt_links == 0 )
+            || ( $is_dataset eq 'yes' ) )
         {
             #высота текущей стадии, стейджа
             my $curr_j = $j + $max;
@@ -1179,7 +1187,8 @@ sub fill_excel_stages_and_links {
             my ( $max, $col ) =
               fill_excel_next_stage( $col, $curr_j, $max, $links, $all,
                 $stage, $direction );
-            $j = $curr_j + $max + 3000;
+            # $j = $curr_j + $max + 3000;
+            $j = $curr_j + $max + 100;
 
             # }
             # else {
@@ -1202,6 +1211,20 @@ sub fill_excel_next_stage {
 #дальше правее должны пойти те стейджы (стадии, шаги, этапы по-русски)
 #у которых $input_links входит в @$output_links
     my $ref_next_stages = get_next_stage_for_link( $links, $stage, $direction );
+
+    #-------------------------------------------------------------------
+    # package setup data
+    #-------------------------------------------------------------------
+
+    #$Data::TreeDumper::Useascii = 0 ;
+    #$Data::TreeDumper::Maxdepth = 2 ;
+    # $Data::TreeDumper::Displaycallerlocation=1;
+    print DumpTree( $stage,           'for_stage' );
+    print DumpTree( $ref_next_stages, 'ref_next_stages' );
+
+    # print DumpTree($col, 'col') ;
+    # print DumpTree($j, 'j') ;
+    print DumpTree( $direction, 'direction' );
 
 # say "\n\nDebug_names_stages\n";
 # p $is_stage_already_shown;
@@ -1302,9 +1325,9 @@ sub get_next_stage_for_link {
 #ищем входные линки совпадающие с нашим выходным
             for my $in_link_name ( @{ $loc_stage->{$in_suffix} } ) {
                 if ( $out_link_name eq $in_link_name ) {
-                    say "\nЛинки совпали, ура!!!\n\n";
-                    say
-"$out_link_name in $stage->{stage_name} eq $in_link_name in $loc_stage->{stage_name}";
+
+# say "\nЛинки совпали, ура!!!\n\n";
+# say "$out_link_name in $stage->{stage_name} eq $in_link_name in $loc_stage->{stage_name}";
                     push @next_stages, $loc_stage;
                 }
             }
@@ -1331,10 +1354,11 @@ sub fill_excel_inout_links {
     my %start_stages_of = map { $_ => 1 } @start_stages;
 
     for my $link (qw/input_links output_links/) {
-        print "\n\n\nDEbug\n\n";
-        say 0 + @{ $stage->{$link} };
-        p $link;
-        p $stage;
+
+        # print "\n\n\nDEbug\n\n";
+        # say 0 + @{ $stage->{$link} };
+        # p $link;
+        # p $stage;
 
         #если число линков больше нуля
         if ( 0 + @{ $stage->{$link} } > 0 ) {
