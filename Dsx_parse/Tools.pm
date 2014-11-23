@@ -20,6 +20,15 @@ use Data::Printer {
     return_value   => 'pass',
 };
 use Data::TreeDumper;
+   #-------------------------------------------------------------------
+    # package setup data
+    #-------------------------------------------------------------------
+
+    #$Data::TreeDumper::Useascii = 0 ;
+    #$Data::TreeDumper::Maxdepth = 2 ;
+    # $Data::TreeDumper::Displaycallerlocation=1;
+ 
+
 use version; our $VERSION = qv('0.0.1');
 use Sub::Exporter -setup => {
     exports => [
@@ -1117,6 +1126,7 @@ sub show_stage_prop {
     # return $j;
     return $max;
 }
+
 #
 # New subroutine "fill_excel_stages_and_links" extracted - Wed Nov 5 16:12:45 2014.
 #
@@ -1140,35 +1150,17 @@ sub fill_excel_stages_and_links {
         print DumpTree( $stage->{stage_name},   '$stage->{stage_name}' );
         print DumpTree( $stage->{input_links},  '$stage->{input_links}' );
         print DumpTree( $stage->{output_links}, '$stage->{output_links}' );
-
-        # p $stage->{input_links}
-        # p $stage->{output_links}
         my $is_dataset = 'no';
         my $links_name =
           ( $direction eq 'start' ) ? 'input_links' : 'output_links';
         my $cnt_links = 0;
-
-        # if ( $direction eq 'start' ) {
         $cnt_links = 0 + @{ $stage->{$links_name} };
+
         if ( $cnt_links == 1
             && substr( ${ $stage->{$links_name} }[0], -2 ) eq 'ds' )
         {
             $is_dataset = 'yes';
-
-            # say "this is ds:".${$stage->{$links_name}}[0];
-            # say "this is ds:".substr(${$stage->{$links_name}}[0],-2);
-            # say "this is ds:".substr(${$stage->{output_links}}[0],-2);
         }
-
-        # }
-        # elsif ( $direction eq 'end' ) {
-        # $cnt_out_links = 0 + @{ $stage->{output_links} };
-
-        # if ($cnt_in_links==1){
-        # say "this is ds:".substr(${$stage->{output_links}}[0],-2);
-        # }
-        # }
-        # $cnt_links=max($cnt_in_links,$cnt_out_links);
 
         #также, если стейдж типа ds
         if ( ( $start_stages_of{ $stage->{operator_name} } && $cnt_links == 0 )
@@ -1181,27 +1173,22 @@ sub fill_excel_stages_and_links {
             $max = max( $max, 5 );
             $j = $j + $max + 10;
 
-            # $painted{$stage->{stage_name}}++;
-            # say "\nDebug_names1\n";
-            # p %painted;
             my ( $max, $col ) =
               fill_excel_next_stage( $col, $curr_j, $max, $links, $all,
                 $stage, $direction );
-            # $j = $curr_j + $max + 3000;
             $j = $curr_j + $max + 100;
 
-            # }
-            # else {
-            # ($max, $col) = fill_excel_inout_links($all, $col, $j, $stage);
-            # $col++;
-            # print "\nDebug_max=$max in $stage->{stage_name}\n\n";
         }
-
-        # }
     }
     $j = $j + 4 + $max;
     return $j;
 }
+
+    # print DumpTree( $stage,           'for_stage' );
+    # print DumpTree( $ref_next_stages, 'ref_next_stages' );
+# print DumpTree( $direction, 'direction' );
+
+
 #
 # New subroutine "fill_excel_next_stage" extracted - Fri Nov 21 11:19:14 2014.
 #
@@ -1212,22 +1199,6 @@ sub fill_excel_next_stage {
 #у которых $input_links входит в @$output_links
     my $ref_next_stages = get_next_stage_for_link( $links, $stage, $direction );
 
-    #-------------------------------------------------------------------
-    # package setup data
-    #-------------------------------------------------------------------
-
-    #$Data::TreeDumper::Useascii = 0 ;
-    #$Data::TreeDumper::Maxdepth = 2 ;
-    # $Data::TreeDumper::Displaycallerlocation=1;
-    print DumpTree( $stage,           'for_stage' );
-    print DumpTree( $ref_next_stages, 'ref_next_stages' );
-
-    # print DumpTree($col, 'col') ;
-    # print DumpTree($j, 'j') ;
-    print DumpTree( $direction, 'direction' );
-
-# say "\n\nDebug_names_stages\n";
-# p $is_stage_already_shown;
 #выводим следующие по порядку стадии справа
     for my $next_stage ( @{$ref_next_stages} ) {
         ( $max, $col ) =
@@ -1244,20 +1215,17 @@ sub fill_excel_next_stage {
             my $ref_next_stages3 =
               get_next_stage_for_link( $links, $next_stage2, $direction );
 
-            # my $cnt_of_next_stages = 0 + @{$ref_next_stages3};
-            # if ( $cnt_of_next_stages > 0 ) {
             ( $max, $col, $curr_j ) =
               fill_excel_next_stage2( $col, $curr_j, $max, $links,
                 $next_stage2, $all, $ref_next_stages3, $direction );
-
-            # }
-
         }
         $max = max( $max, 5 );
         $curr_j = $curr_j + $max + 10;
     }
     return ( $max, $col );
 }
+
+
 #
 # New subroutine "fill_excel_next_stage2" extracted - Fri Nov 21 13:46:53 2014.
 #
