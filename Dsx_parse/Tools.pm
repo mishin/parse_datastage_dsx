@@ -19,6 +19,7 @@ use Data::Printer {
     hash_separator => ': ',
     return_value   => 'pass',
 };
+use Data::TreeDumper ;
 use version; our $VERSION = qv('0.0.1');
 use Sub::Exporter -setup => {
     exports => [
@@ -1126,6 +1127,21 @@ sub fill_excel_stages_and_links {
     my %start_stages_of = map { $_ => 1 } @start_stages;
     my $max             = 0;
     my $orig_col        = $col;
+
+ #-------------------------------------------------------------------
+# package setup data
+#-------------------------------------------------------------------
+
+         #$Data::TreeDumper::Useascii = 0 ;
+         #$Data::TreeDumper::Maxdepth = 2 ;
+ $Data::TreeDumper::Displaycallerlocation=1;
+
+         print DumpTree($all, 'all') ;
+         print DumpTree($col, 'col') ;
+         print DumpTree($j, 'j') ;
+         print DumpTree($direction, 'direction') ;
+         
+
 
 #сюда кладем те стадии, которые уже выводились в excel
 # my %painted = ();
