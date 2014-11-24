@@ -1141,7 +1141,36 @@ sub fill_excel_stages_and_links {
 #сюда кладем те стадии, которые уже выводились в excel
 # my %painted = ();
 # my $save_col=0;
+#число стейджей всего:
+my $cnt_ctages=0+@{$links};
+say "number of stages: $cnt_ctages";
+=pod
+26 итого массив из 26 ячеек
+на самом деле их и того меньше
+в одну сторону
+start-5
+в другую 
+end -3
+итого, всего 8 дорожек
+26*8 - 208 элементов во всех дорожках
+
+каждый элемент из которого
+нужно запомнить как путь,
+например,
+0-й элемент
+будет как хэш, где
+number_in_road=0
+если он первый
+stage_name=MART_UREP_WRH_DS
+и потом просто пройдемся по этому отсортированному хэшу
+и выведем все стейджи
+
+=cut
+
     for my $stage ( @{$links} ) {
+    #Нужно просто сделать дерево для каждого линка,
+    #а потом вывести его    
+        
 
 #проверяем, что этот стейдж еще не выводили
 # if (!$painted{$stage->{stage_name}}) {
@@ -1195,9 +1224,12 @@ sub fill_excel_stages_and_links {
 sub fill_excel_next_stage {
     my ( $col, $curr_j, $max, $links, $all, $stage, $direction ) = @_;
 
+ print DumpTree( $links,           '$links_$links' );
+
 #дальше правее должны пойти те стейджы (стадии, шаги, этапы по-русски)
 #у которых $input_links входит в @$output_links
     my $ref_next_stages = get_next_stage_for_link( $links, $stage, $direction );
+
 
 #выводим следующие по порядку стадии справа
     for my $next_stage ( @{$ref_next_stages} ) {
@@ -1281,6 +1313,9 @@ sub get_next_stage_for_link {
 
   #массив стадий, которые идут сразу за нашей
     my @next_stages = ();
+    my $i=0;
+    say "get_next_stage_for_link".$i++;
+#     print DumpTree( $links,           '$links' );
 
 #Выводим все выходные линки из текущей стадии
     for my $out_link_name ( @{ $stage->{$out_suffix} } ) {
