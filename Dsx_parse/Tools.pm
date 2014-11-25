@@ -81,17 +81,20 @@ sub process_orchestrate_code_properties {
     my ($orchestrate_code_body, $ORCHESTRATE_CODE_RX) = @_;
     my $fields;
     my @stage_and_fields = ();
-    while ($orchestrate_code_body =~ m/$ORCHESTRATE_CODE_RX/g) {
+	my $ORCHESTRATE_BODY_RX = make_regexp();
+    while ($orchestrate_code_body =~ m/$ORCHESTRATE_BODY_RX/g) {
+	
         my %stage_and_fields = ();
-        print "\nFound Orchestrate StageName: $+{stage_name}\n";
-        print "Found Orchestrate OperatorName: $+{operator_name}\n";
+        say "Found Orchestrate StageName: $+{stage_name}";
+        say "Found Orchestrate OperatorName: $+{operator_name}";
         $stage_and_fields{stage_name}    = $+{stage_name};
         $stage_and_fields{operator_name} = $+{operator_name};
-        if (defined $+{source_body}) {
-
+        if (defined $+{stage_body}) {	
             # print "Found Orchestrate SourceBody: $+{source_body}\n";
-            $fields = process_orchestrate_body($+{source_body});
+            $fields = process_orchestrate_body($+{stage_body});
             $stage_and_fields{fields} = $fields;
+			
+			print DumpTree($fields,     'fields');			
         }
 
 # my $ORCHESTRATE_CODE_RX =
@@ -370,9 +373,15 @@ sub process_stage_stages {
 #
 sub process_stage {
     my ($job_body, $COMPILE_RX_REF) = @_;
+	
+	# print DumpTree($job_body,     'job_body');
+	# print DumpTree($COMPILE_RX_REF,     'COMPILE_RX_REF');
     my %job_prop;
     while ($job_body =~ m/$COMPILE_RX_REF->{JOB_DESC_RX}/g) {
+	
         $job_prop{JobName} = from_dsx_2_utf($+{job_name});
+		
+		
         if (defined($+{job_description})) {
             $job_prop{JobDesc} = from_dsx_2_utf($+{job_description});
         }
@@ -381,6 +390,9 @@ sub process_stage {
     my $fields;
     my $only_links;
     if ($job_body =~ $COMPILE_RX_REF->{ORCHESTRATE_CODE_FULL_RX}) {
+	
+	say 'We_are_in_the_ORCHESTRATE_CODE_FULL_RX_ZZZ'.$COMPILE_RX_REF->{ORCHESTRATE_CODE_RX};#сюда приходим, уже хорошо
+	say 'We_are_in_the_orchestrate_code_body: '.$+{orchestrate_code_body};#сюда приходим, уже хорошо
         $fields =
           process_orchestrate_code_properties($+{orchestrate_code_body},
             $COMPILE_RX_REF->{ORCHESTRATE_CODE_RX});
@@ -448,12 +460,12 @@ sub get_job_name {
     my $ORCHESTRATE_CODE_FULL_RX =
       qr{OrchestrateCode \Q=+=+=+=\E(?<orchestrate_code_body>.*?)\Q=+=+=+=\E}s;
     my $stage_operator =
-      qr{STAGE: (?<stage_name>\w+).*?Operator\n(?<operator_name>\w+)};
+      qr{STAGE:\s* (?<stage_name>\w+).*?Operator\n(?<operator_name>\w+)};
     my $outputs     = qr{## Outputs.*?'(?<outputs_name>.*?)'};
     my $inputs      = qr{## Inputs.*? '(?<inputs_name>.*?)'};
     my $source_body = qr{-source 0 '{(?<source_body>.*?)\n}'};
     my $ORCHESTRATE_CODE_RX =
-      qr%($stage_operator(.*?$source_body.*?$outputs)|($stage_operator(.*?$inputs|.*?)(.*?$outputs|.*?)))%s;
+      qr%($stage_operator(.*?$source_body.*?$outputs)|($stage_operator.*?($inputs)?.*?($outputs)?))%s;
     my $IDENTLIST_RX =
       qr{BEGIN DSSUBRECORD.*?Name "IdentList".*?Value "(?<job_identlist_value>.*?)(?<!\\)".*?END DSSUBRECORD}s;
     my $CPARAMETERS_RX =
@@ -466,7 +478,7 @@ sub get_job_name {
       qr{(?<parameter_set_body>BEGIN DSRECORD.*?Identifier "(?<parameter_set>\w+)".*?OLEType "CParameterSet".*?ShortDesc "(?<parameter_set_desc>.*?)(?<!\\)".*?ParamValues "(?<param_values>.*?)".*?END DSRECORD)}s;
     my $JOB_RX = qr{(?<job_body>BEGIN DSJOB.*?END DSJOB)}s;
     my $JOB_DESC_RX =
-      qr{BEGIN DSRECORD.*?OLEType "CJobDefn".*?Name "(?<job_name>\w+)"(\n\s+Description "(?<job_description>.*?)(?<!\\)"|)}s;
+      qr{BEGIN DSRECORD.*?OLEType "CJobDefn".*?Name "(?<job_name>\w+)".*?(Description "(?<job_description>.*?)(?<!\\)")?}s;
     my $JOB_ANNOTATION_TEXT_RX =
       qr{BEGIN DSRECORD.*?OLEType "CAnnotation".*?AnnotationText "(?<annotation_text>.*?)(?<!\\)"}s;
     my $ole_type =
@@ -503,20 +515,25 @@ sub get_job_name {
     {
         local $/ = '';    # Paragraph mode
         while ($data =~ m/$JOB_HEADER_RX/g) {
+			say '';
+	
             $head_prop = process_job_header($+{job_header});
         }
         while ($data =~ m/$JOB_RX/g) {
+		say 'We_are_in_the_JOB_RX2';
+		say $+{job_body};
             $job_prop = process_stage($+{job_body}, \%COMPILE_RX);
             push @jobs_properties, $job_prop;
         }
 
         #p $job_prop;
         while ($data =~ m/$PARAMETER_SETS_RX/g) {
+			say 'We_are_in_the_PARAMETER_SETS_RX3';
             process_parameters($+{parameter_sets_body}, \%COMPILE_PARAM_RX);
         }
     }
     my @prop_4_excel = ($head_prop, \@jobs_properties);
-    make_revision_history(\@prop_4_excel);
+    make_revision_history(\@prop_4_excel,$file_name);
 }
 
 sub process_job_header {
@@ -532,7 +549,13 @@ ToolInstanceID "AUDIT"
 MDISVersion "1.0"
 Date "2014-10-29"
 Time "14.09.57"
-ServerVersion "8.7"
+ServerVersion "8.7" ИЛИ    ServerVersion "8.1"
+         и похоже регекспы разные
+		 хотя это нужно уточнить,
+		 пока оставляем одинаковые модули,
+		 хотя и была идея раздвоить
+		 Dsx_parse_8_7\Tools.pm 
+		 Dsx_parse_8_1\Tools.pm 
 END HEADER
 =cut	
 
@@ -1157,6 +1180,8 @@ sub fill_excel_stages_and_links {
     my $max             = 0;
     my $orig_col        = $col;
 
+		print DumpTree($all,     'all_fields');	
+	
 #сюда кладем те стадии, которые уже выводились в excel
 # my %painted = ();
 # my $save_col=0;
@@ -1769,13 +1794,14 @@ sub make_curr_job {
 }
 
 sub make_revision_history {
-    my ($prop_4_excel) = @_;
+    my ($prop_4_excel,$file_name) = @_;
     my ($head_prop, $job_prop) = @{$prop_4_excel};
     my @jobs_properties = @{$job_prop};
+	$file_name =~ s{\.[^.]+$}{};
     my $workbook =
       Spreadsheet::WriteExcel->new($head_prop->{ProjectName} . '_ON_'
           . $head_prop->{ServerName}
-          . '.xls');
+          .'_'.$file_name .'.xls');
     set_excel_properties($workbook);
 
     # Add some worksheets
