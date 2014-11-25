@@ -696,9 +696,13 @@ sub fill_excel_header {
         "Initial version",
         $ref_formats->{rows_fmt}
     );
-    $revision_history->write(1, 3, "Мишин Н.А.", $ref_formats->{rows_fmt});
-    $revision_history->write(0, 5, "Project",    $ref_formats->{heading});
-    $revision_history->write(0, 6, "Server",     $ref_formats->{heading});
+    $revision_history->write(
+        1, 3,
+        "Мишин Н.А.",
+        $ref_formats->{rows_fmt}
+    );
+    $revision_history->write(0, 5, "Project", $ref_formats->{heading});
+    $revision_history->write(0, 6, "Server",  $ref_formats->{heading});
     $revision_history->write(
         1, 5,
         $head_prop->{ProjectName},
@@ -1198,7 +1202,7 @@ stage_name=MART_UREP_WRH_DS
     for my $stage (@{$links}) {
         my $is_dataset = 'no';
 
-        #рахъясняющая переменная, не удалять, а то быдет плохо читаться код
+#рахъясняющая переменная, не удалять, а то быдет плохо читаться код
         my $cnt_links = 0 + @{$stage->{$links_type}};
         if ($cnt_links == 1
             && substr(${$stage->{$links_type}}[0], -2) eq 'ds')
@@ -1206,9 +1210,9 @@ stage_name=MART_UREP_WRH_DS
             $is_dataset = 'yes';
         }
 
-    #также, если стейдж типа ds или это источник в виде базы данных 'pxbridge'
-    #у которого нет входящих линков для 1-го и выходящих для последнего
-    #точки приземления! (Андрей Бабуров)
+#также, если стейдж типа ds или это источник в виде базы данных 'pxbridge'
+#у которого нет входящих линков для 1-го и выходящих для последнего
+#точки приземления! (Андрей Бабуров)
         if (   ($start_stages_of{$stage->{operator_name}} && $cnt_links == 0)
             || ($is_dataset eq 'yes'))
         {
@@ -1226,13 +1230,14 @@ stage_name=MART_UREP_WRH_DS
             $j = $curr_j + $max + 100;
 
             my %road_map = ();
+
             # print DumpTree( $stage, '$stage_find_links_type' );
-            $road_map{number_in_road} = 0;
-            $road_map{stage_name}     = $stage->{stage_name};
-            $road_map{last_stage}     = $stage->{stage_name};
-            $road_map{last_links}     = $stage->{$links_type};
-            $road_map{last_links_type}     = $links_type;
-            $road_map{orig_stage}     = $stage;
+            $road_map{number_in_road}  = 0;
+            $road_map{stage_name}      = $stage->{stage_name};
+            $road_map{last_stage}      = $stage->{stage_name};
+            $road_map{last_links}      = $stage->{$links_type};
+            $road_map{last_links_type} = $links_type;
+            $road_map{orig_stage}      = $stage;
             push @roads, \%road_map;
 
 
@@ -1247,10 +1252,9 @@ stage_name=MART_UREP_WRH_DS
     }
 
 
-
-    # print DumpTree( \@road_and_next, '@road_and_next' );
-    #еще раз идем по линкам и дополняем наши дорожки
-    # for my $stage ( @{$links} ) {
+# print DumpTree( \@road_and_next, '@road_and_next' );
+#еще раз идем по линкам и дополняем наши дорожки
+# for my $stage ( @{$links} ) {
 
     # }
 
@@ -1261,9 +1265,11 @@ stage_name=MART_UREP_WRH_DS
 
 sub add_stage_to_road {
     my ($ref_road, $stage_2_road) = @_;
+
 #my @road_and_next=();
-for my $road (@{$ref_road}){
-    # print DumpTree($ref_road,     'ref_road');
+    for my $road (@{$ref_road}) {
+
+        # print DumpTree($ref_road,     'ref_road');
 #my %road_stage=();
 #my $next_stages=get_next_stage_for_link( $links, $road->{orig_stage}, $direction );
 #$road_stage{road}=$road;
@@ -1272,11 +1278,12 @@ for my $road (@{$ref_road}){
 #find_current_road_and_add_next_stage($road,$next_stages);
 # $road->{stage_name};
 # test if curr_stage eq next_stage for main_stage
-}
-# 
+    }
+
+#
     print DumpTree($ref_road,     'ref_road');
     print DumpTree($stage_2_road, 'stage_2_road');
-return $ref_road;
+    return $ref_road;
 
 }
 
@@ -1379,7 +1386,7 @@ sub get_next_stage_for_link {
         $in_suffix  = 'output_links';
     }
 
-    #массив стадий, которые идут сразу за нашей
+#массив стадий, которые идут сразу за нашей
     my @next_stages = ();
     my $i           = 0;
     say "get_next_stage_for_link" . $i++;
@@ -1668,11 +1675,15 @@ sub fill_excel_stages {
     $j = fill_excel_job_annotation_text($ref_formats, $curr_job,
         $ref_job_annotation_texts, $j);
 
-# $j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
-#$j = fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
-#$j = fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
-#$j = fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
-#$j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
+    $j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
+    $j =
+      fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
+    $j =
+      fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
+    $j =
+      fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
+    $j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
+
 # $j = fill_excel_only_links($ref_formats, $curr_job, $col, $job_pop, $j);
 # $j = fill_excel_only_links($job_and_formats, $col, $j);
 # $j = fill_excel_stages_and_links($ref_formats, $curr_job, $col, $job_pop, $j);
@@ -1686,7 +1697,7 @@ sub fill_rev_history {
     $revision_history->write(5 + $i, 6, "0", $ref_formats->{rows_fmt});
     $revision_history->write_url(
         5 + $i, 7,
-        'internal:' . $job_pop->{JobName} . '_' . $num . '!A2',
+        'internal:' . substr($job_pop->{JobName}, -28) . '_' . $num . '!A2',
         $ref_formats->{url_format},
         $job_pop->{JobName}
     );
@@ -1732,8 +1743,8 @@ sub fill_excel_body {
 
 sub make_curr_job {
     my ($loc_hash_prop, $ref_formats, $workbook, $i, $num) = @_;
-    my $curr_job =
-      $workbook->add_worksheet($loc_hash_prop->{JobName} . '_' . $num);
+    my $curr_job = $workbook->add_worksheet(
+        substr($loc_hash_prop->{JobName}, -28) . '_' . $num);
     add_write_handler_autofit($curr_job);
     $curr_job->activate();
     $curr_job->write_url(
