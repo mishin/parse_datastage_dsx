@@ -1814,6 +1814,10 @@ sub fill_excel_stages {
       $job_and_formats->{job_pop}->{job_annotation_texts};
     my $ident_list = $job_and_formats->{job_pop}->{IdentList};
     my $fields_all = $job_and_formats->{job_pop}->{fields_all};
+	
+	print DumpTree( $fields_all, 'fields_all' );
+	print DumpTree( $stages, 'stages' );
+	
     my ($ref_formats, $curr_job, $job_pop) = (
         $job_and_formats->{ref_formats},
         $job_and_formats->{curr_job},
@@ -1835,8 +1839,7 @@ sub fill_excel_stages {
       fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
     $j =
       fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
-    $j =
-      fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
+    $j =  fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
     $j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
 
 # $j = fill_excel_only_links($ref_formats, $curr_job, $col, $job_pop, $j);
