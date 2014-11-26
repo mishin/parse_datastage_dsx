@@ -80,21 +80,22 @@ sub process_parameters_properties {
 sub process_orchestrate_code_properties {
     my ($orchestrate_code_body, $ORCHESTRATE_CODE_RX) = @_;
     my $fields;
-    my @stage_and_fields = ();
-	my $ORCHESTRATE_BODY_RX = make_regexp();
+    my @stage_and_fields    = ();
+    my $ORCHESTRATE_BODY_RX = make_regexp();
     while ($orchestrate_code_body =~ m/$ORCHESTRATE_BODY_RX/g) {
-	
+
         my %stage_and_fields = ();
         say "Found Orchestrate StageName: $+{stage_name}";
         say "Found Orchestrate OperatorName: $+{operator_name}";
         $stage_and_fields{stage_name}    = $+{stage_name};
         $stage_and_fields{operator_name} = $+{operator_name};
-        if (defined $+{stage_body}) {	
+        if (defined $+{stage_body}) {
+
             # print "Found Orchestrate SourceBody: $+{source_body}\n";
             $fields = process_orchestrate_body($+{stage_body});
             $stage_and_fields{fields} = $fields;
-			
-			print DumpTree($fields,     'fields');			
+
+            print DumpTree($fields, 'fields');
         }
 
 # my $ORCHESTRATE_CODE_RX =
@@ -133,26 +134,58 @@ sub process_orchestrate_body {
     my $fields;
     while ($orchestrate_code_body =~ m/$ORCHESTRATE_ELEMENTS_RX/g) {
         print "\nInput Fields:\n";
+        say $+{sql_type};
+        say $+{sql_precision};
         $fields =
           process_orchestrate_sql_type($+{sql_type}, $+{sql_precision});
     }
     return $fields;
 }
 
+=pod
+
+          if ($@)
+        {
+	            print "Error [$@] occured!";
+
+            say "DEBUG_keys1:";
+			print DumpTree( %hash,   '%hash' );
+            print DumpTree( $sql_type,   'sql_type' );
+			print DumpTree( $sql_precision,   '%sql_precision' );
+            say "END_DEBUG_keys1:";
+
+        }
+=cut		
+
 sub process_orchestrate_sql_type {
     my ($sql_type, $sql_precision) = @_;
     my $prec_hash = process_orchestrate_sql_precision($sql_precision);
     tie my %hash, 'Tie::IxHash';
-    %hash = map { split /=/, $_ } (split /, /, $sql_type);
+
+    # my @types=split /\s*,\s*/, $sql_type;
+    # print DumpTree(\@types,'types');
+    %hash = map { split /=/, $_ } (split /\s*,\s*/, $sql_type);
     my @fields = ();
     for my $key (keys %hash) {
         my %hash_datatypes = ();
-        print $key. ": "
-          . decode_sql_type($hash{$key}) . "("
-          . $prec_hash->{$key} . ")\n";
+
+        # print $key. ": "
+        # . decode_sql_type($hash{$key}) . "("
+        # . $prec_hash->{$key} . ")\n";
+
+        # say 'DEBUG_$key:'.$key;
+        # say 'DEBUG_$hash{$key}:'.$hash{$key};
+
+=pod
+CTNUMDOG: VUse of uninitialized value in concatenation (.) or string at Dsx_parse/Tools.pm line 166.
+Use of uninitialized value in concatenation (.) or string at Dsx_parse/Tools.pm line 170.
+arChar(20)
+=cut		  
+
         $hash_datatypes{field_name} = $key;
         $hash_datatypes{sql_type} =
           decode_sql_type($hash{$key}) . "(" . $prec_hash->{$key} . ")";
+
         push @fields, \%hash_datatypes;
     }
     return \@fields;
@@ -319,7 +352,20 @@ sub process_stage_stages {
         print "\nFound OLEType " . $+{ole_type} . " \n";
         my $stage_body = $+{stage_body};
         my $FIELD_RECORD_RX =
-          qr{(?<field_body>BEGIN DSSUBRECORD\s+Name "(?<field_name>\w+)"\s+SqlType "(?<field_type>\w+)"\s+Precision "(?<prec_value>\w+)".*?(.*?ParsedDerivation "(?<parsed_deriv>.*?)(?<!\\)"|.*?).*?(SourceColumn "(?<source_column>.*?)"|.*?).*?END DSSUBRECORD)}s;
+          qr{(?<field_body>BEGIN DSSUBRECORD\s+Name "(?<field_name>\w+)"\s+SqlType "(?<field_type>\w+)".*?Precision "(?<prec_value>\w+)".*?Scale "(?<scale>\d+)".*?Nullable "(?<nullable>\d+).*?KeyPosition "(?<keyposition>\d+).*?(.*?ParsedDerivation "(?<parsed_deriv>.*?)(?<!\\)"|.*?).*?(SourceColumn "(?<source_column>.*?)"|.*?).*?END DSSUBRECORD)}s;
+
+
+=pod
+.*?(.*?Nullable "(?<nullable>.*?).*?(.*?KeyPosition "(?<keyposition>.*?)
+      BEGIN DSSUBRECORD
+         Name "POREPDATE"
+         Description "<none>"
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+=cut		  
 
 # write_file('out_stages/'.$+{stage_name}.'_'.$+{ole_type}.'.dsx',$stage_body);
         while ($stage_body =~ m/$FIELD_RECORD_RX/g) {
@@ -343,6 +389,17 @@ sub process_stage_stages {
             $hash_datatypes{sql_type} =
               decode_sql_type($+{field_type}) . "(" . $+{prec_value} . ")";
             print "Found sql_type: " . $hash_datatypes{sql_type} . " \n";
+
+
+            $hash_datatypes{nullable} = $+{nullable};
+            print "Found nullable: " . $hash_datatypes{nullable} . " \n";
+
+            $hash_datatypes{keyposition} = $+{keyposition};
+            print "Found keyposition: "
+              . $hash_datatypes{keyposition} . " \n";
+
+            $hash_datatypes{scale} = $+{scale};
+            print "Found scale: " . $hash_datatypes{scale} . " \n";
 
             #p %hash_datatypes;
             push @fields_and_types, \%hash_datatypes;
@@ -373,15 +430,15 @@ sub process_stage_stages {
 #
 sub process_stage {
     my ($job_body, $COMPILE_RX_REF) = @_;
-	
-	# print DumpTree($job_body,     'job_body');
-	# print DumpTree($COMPILE_RX_REF,     'COMPILE_RX_REF');
+
+    # print DumpTree($job_body,     'job_body');
+    # print DumpTree($COMPILE_RX_REF,     'COMPILE_RX_REF');
     my %job_prop;
     while ($job_body =~ m/$COMPILE_RX_REF->{JOB_DESC_RX}/g) {
-	
+
         $job_prop{JobName} = from_dsx_2_utf($+{job_name});
-		
-		
+
+
         if (defined($+{job_description})) {
             $job_prop{JobDesc} = from_dsx_2_utf($+{job_description});
         }
@@ -390,9 +447,12 @@ sub process_stage {
     my $fields;
     my $only_links;
     if ($job_body =~ $COMPILE_RX_REF->{ORCHESTRATE_CODE_FULL_RX}) {
-	
-	say 'We_are_in_the_ORCHESTRATE_CODE_FULL_RX_ZZZ'.$COMPILE_RX_REF->{ORCHESTRATE_CODE_RX};#сюда приходим, уже хорошо
-	say 'We_are_in_the_orchestrate_code_body: '.$+{orchestrate_code_body};#сюда приходим, уже хорошо
+
+        say 'We_are_in_the_ORCHESTRATE_CODE_FULL_RX_ZZZ'
+          . $COMPILE_RX_REF
+          ->{ORCHESTRATE_CODE_RX}; #сюда приходим, уже хорошо
+        say 'We_are_in_the_orchestrate_code_body: '
+          . $+{orchestrate_code_body}; #сюда приходим, уже хорошо
         $fields =
           process_orchestrate_code_properties($+{orchestrate_code_body},
             $COMPILE_RX_REF->{ORCHESTRATE_CODE_RX});
@@ -515,25 +575,25 @@ sub get_job_name {
     {
         local $/ = '';    # Paragraph mode
         while ($data =~ m/$JOB_HEADER_RX/g) {
-			say '';
-	
+            say '';
+
             $head_prop = process_job_header($+{job_header});
         }
         while ($data =~ m/$JOB_RX/g) {
-		say 'We_are_in_the_JOB_RX2';
-		say $+{job_body};
+            say 'We_are_in_the_JOB_RX2';
+            say $+{job_body};
             $job_prop = process_stage($+{job_body}, \%COMPILE_RX);
             push @jobs_properties, $job_prop;
         }
 
         #p $job_prop;
         while ($data =~ m/$PARAMETER_SETS_RX/g) {
-			say 'We_are_in_the_PARAMETER_SETS_RX3';
+            say 'We_are_in_the_PARAMETER_SETS_RX3';
             process_parameters($+{parameter_sets_body}, \%COMPILE_PARAM_RX);
         }
     }
     my @prop_4_excel = ($head_prop, \@jobs_properties);
-    make_revision_history(\@prop_4_excel,$file_name);
+    make_revision_history(\@prop_4_excel, $file_name);
 }
 
 sub process_job_header {
@@ -877,6 +937,27 @@ sub fill_excel_ai_input_name {
                             $single_field->{sql_type},
                             $ref_formats->{rows_fmt}
                         );
+                        my $null =
+                          ($single_field->{nullable} == 0)
+                          ? 'ДА'
+                          : 'НЕТ';
+
+                        $curr_job->write(
+                            $j + 8 + $r,
+                            $col_map + 4,
+                            $null, $ref_formats->{rows_fmt}
+                        );
+                        my $key =
+                          ($single_field->{keyposition} == 1)
+                          ? 'ДА'
+                          : 'НЕТ';
+                        $curr_job->write(
+                            $j + 8 + $r,
+                            $col_map + 5,
+                            $key, $ref_formats->{rows_fmt}
+                        );
+
+
                         $r++;
                         $max = max_q($max, $r);
                     }
@@ -923,6 +1004,27 @@ sub fill_excel_ai_output_name {
                             $single_field->{sql_type},
                             $ref_formats->{rows_fmt}
                         );
+
+                        my $null =
+                          ($single_field->{nullable} == 0)
+                          ? 'ДА'
+                          : 'НЕТ';
+
+                        $curr_job->write(
+                            $j + 8 + $q,
+                            $col_map + 2,
+                            $null, $ref_formats->{rows_fmt}
+                        );
+                        my $key =
+                          ($single_field->{keyposition} == 1)
+                          ? 'ДА'
+                          : 'НЕТ';
+                        $curr_job->write(
+                            $j + 8 + $q,
+                            $col_map + 3,
+                            $key, $ref_formats->{rows_fmt}
+                        );
+
                         $q++;
                         $max = max_q($max, $q);
                     }
@@ -942,7 +1044,8 @@ sub fill_excel_ai_increment_col_map {
     if (   defined $stage_prop->{InputName}
         || defined $stage_prop->{OutputName})
     {
-        $col_map = $col_map + 6;
+        # $col_map = $col_map + 6;
+        $col_map = $col_map + 10;
     }
     return $col_map;
 }
@@ -975,6 +1078,7 @@ sub fill_excel_stage_info {
             $stage_prop, $stage, $j);
         $max = fill_excel_ai_input_name($col, $stage_prop, $max, $col_map,
             $curr_job, $stages, $ref_formats, $j);
+			# $col_map=$col_map+2;
         $max = fill_excel_ai_output_name($col, $stage_prop, $max, $col_map,
             $curr_job, $stages, $ref_formats, $j);
         $col_map = fill_excel_ai_increment_col_map($col_map, $stage_prop);
@@ -1180,8 +1284,8 @@ sub fill_excel_stages_and_links {
     my $max             = 0;
     my $orig_col        = $col;
 
-		print DumpTree($all,     'all_fields');	
-	
+    print DumpTree($all, 'all_fields');
+
 #сюда кладем те стадии, которые уже выводились в excel
 # my %painted = ();
 # my $save_col=0;
@@ -1504,16 +1608,23 @@ sub fill_excel_ai_header_mapping {
         );
         $curr_job->write($j + 8, $col_map + 1,
             "Datatype", $ref_formats->{map_fmt});
+			
+			        $curr_job->write($j + 8, $col_map + 2,
+            "nullable", $ref_formats->{map_fmt});
+        $curr_job->write($j + 8, $col_map + 3,
+            "keyposition", $ref_formats->{map_fmt});
         $curr_job->write(
             $j + 8,
-            $col_map + 2,
+            $col_map + 4,
             "Source Column",
             $ref_formats->{map_fmt}
         );
-        $curr_job->write($j + 8, $col_map + 3,
+        $curr_job->write($j + 8, $col_map + 5,
             "Datatype", $ref_formats->{map_fmt});
-        $curr_job->write($j + 8, $col_map + 4,
-            "Expression/Decode", $ref_formats->{map_fmt});
+        $curr_job->write($j + 8, $col_map + 6,
+            "nullable", $ref_formats->{map_fmt});
+        $curr_job->write($j + 8, $col_map + 7,
+            "keyposition", $ref_formats->{map_fmt});
     }
     return 1;
 }
@@ -1612,6 +1723,11 @@ sub fill_excel_fields_all {
                 $ref_formats->{heading});
             $curr_job->write($j + 11, $col + 1, "field_type",
                 $ref_formats->{heading});
+
+            $curr_job->write($j + 11, $col + 2, "nullable",
+                $ref_formats->{heading});
+            $curr_job->write($j + 11, $col + 3, "keyposition",
+                $ref_formats->{heading});
             my $q = 1;
 
             for my $single_field (@{$fields_all_element->{fields}}) {
@@ -1627,10 +1743,24 @@ sub fill_excel_fields_all {
                     $single_field->{sql_type},
                     $ref_formats->{rows_fmt}
                 );
+
+                $curr_job->write(
+                    $j + 11 + $q,
+                    $col + 2,
+                    $single_field->{nullable},
+                    $ref_formats->{rows_fmt}
+                );
+
+                $curr_job->write(
+                    $j + 11 + $q,
+                    $col + 3,
+                    $single_field->{keyposition},
+                    $ref_formats->{rows_fmt}
+                );
                 $q++;
                 $max_q = max_q($max_q, $q);
             }
-            $col = $col + 2;
+            $col = $col + 4;
         }
         $j = $j + 11 + $max_q;
     }
@@ -1794,14 +1924,15 @@ sub make_curr_job {
 }
 
 sub make_revision_history {
-    my ($prop_4_excel,$file_name) = @_;
-    my ($head_prop, $job_prop) = @{$prop_4_excel};
+    my ($prop_4_excel, $file_name) = @_;
+    my ($head_prop,    $job_prop)  = @{$prop_4_excel};
     my @jobs_properties = @{$job_prop};
-	$file_name =~ s{\.[^.]+$}{};
+    $file_name =~ s{\.[^.]+$}{};
     my $workbook =
       Spreadsheet::WriteExcel->new($head_prop->{ProjectName} . '_ON_'
-          . $head_prop->{ServerName}
-          .'_'.$file_name .'.xls');
+          . $head_prop->{ServerName} . '_'
+          . $file_name
+          . '.xls');
     set_excel_properties($workbook);
 
     # Add some worksheets
