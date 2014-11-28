@@ -1471,7 +1471,7 @@ stage_name=MART_UREP_WRH_DS
                 }
 
                 $ref_collect_stages = \%hash_for_check;
-                if ( !%{$ref_collect_stages} ) {
+                if ( !keys %{$ref_collect_stages} ) {
                     last;
                 }
                 push @levels, $ref_collect_stages;    #\%collect_stages;
