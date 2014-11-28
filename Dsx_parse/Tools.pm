@@ -95,7 +95,7 @@ sub process_orchestrate_code_properties {
             $fields = process_orchestrate_body($+{stage_body});
             $stage_and_fields{fields} = $fields;
 
-            print DumpTree($fields, 'fields');
+            # print DumpTree($fields, 'fields');
         }
 
 # my $ORCHESTRATE_CODE_RX =
@@ -133,9 +133,10 @@ sub process_orchestrate_body {
       qr#DSSQLType=\{(?<sql_type>.*?)\}.*?DSSQLPrecision=\{(?<sql_precision>.*?)\}.*?DSSchema=.*?\((?<sql_schema>.*?)\)#s;
     my $fields;
     while ($orchestrate_code_body =~ m/$ORCHESTRATE_ELEMENTS_RX/g) {
-        print "\nInput Fields:\n";
-        say $+{sql_type};
-        say $+{sql_precision};
+
+        # print "\nInput Fields:\n";
+        # say $+{sql_type};
+        # say $+{sql_precision};
         $fields =
           process_orchestrate_sql_type($+{sql_type}, $+{sql_precision});
     }
@@ -448,11 +449,11 @@ sub process_stage {
     my $only_links;
     if ($job_body =~ $COMPILE_RX_REF->{ORCHESTRATE_CODE_FULL_RX}) {
 
-        say 'We_are_in_the_ORCHESTRATE_CODE_FULL_RX_ZZZ'
-          . $COMPILE_RX_REF
-          ->{ORCHESTRATE_CODE_RX}; #сюда приходим, уже хорошо
-        say 'We_are_in_the_orchestrate_code_body: '
-          . $+{orchestrate_code_body}; #сюда приходим, уже хорошо
+# say 'We_are_in_the_ORCHESTRATE_CODE_FULL_RX_ZZZ'
+# . $COMPILE_RX_REF
+# ->{ORCHESTRATE_CODE_RX}; #сюда приходим, уже хорошо
+# say 'We_are_in_the_orchestrate_code_body: '
+# . $+{orchestrate_code_body}; #сюда приходим, уже хорошо
         $fields =
           process_orchestrate_code_properties($+{orchestrate_code_body},
             $COMPILE_RX_REF->{ORCHESTRATE_CODE_RX});
@@ -581,7 +582,8 @@ sub get_job_name {
         }
         while ($data =~ m/$JOB_RX/g) {
             say 'We_are_in_the_JOB_RX2';
-            say $+{job_body};
+
+            # say $+{job_body};
             $job_prop = process_stage($+{job_body}, \%COMPILE_RX);
             push @jobs_properties, $job_prop;
         }
@@ -937,25 +939,26 @@ sub fill_excel_ai_input_name {
                             $single_field->{sql_type},
                             $ref_formats->{rows_fmt}
                         );
-                        my $null =
-                          ($single_field->{nullable} == 0)
-                          ? 'ДА'
-                          : 'НЕТ';
 
-                        $curr_job->write(
-                            $j + 8 + $r,
-                            $col_map + 4,
-                            $null, $ref_formats->{rows_fmt}
-                        );
-                        my $key =
-                          ($single_field->{keyposition} == 1)
-                          ? 'ДА'
-                          : 'НЕТ';
-                        $curr_job->write(
-                            $j + 8 + $r,
-                            $col_map + 5,
-                            $key, $ref_formats->{rows_fmt}
-                        );
+                        # my $null =
+                        # ($single_field->{nullable} == 0)
+                        # ? 'ДА'
+                        # : 'НЕТ';
+
+                        # $curr_job->write(
+                        # $j + 8 + $r,
+                        # $col_map + 4,
+                        # $null, $ref_formats->{rows_fmt}
+                        # );
+                        # my $key =
+                        # ($single_field->{keyposition} == 1)
+                        # ? 'ДА'
+                        # : 'НЕТ';
+                        # $curr_job->write(
+                        # $j + 8 + $r,
+                        # $col_map + 5,
+                        # $key, $ref_formats->{rows_fmt}
+                        # );
 
 
                         $r++;
@@ -1005,25 +1008,25 @@ sub fill_excel_ai_output_name {
                             $ref_formats->{rows_fmt}
                         );
 
-                        my $null =
-                          ($single_field->{nullable} == 0)
-                          ? 'ДА'
-                          : 'НЕТ';
+                        # my $null =
+                        # ($single_field->{nullable} == 0)
+                        # ? 'ДА'
+                        # : 'НЕТ';
 
-                        $curr_job->write(
-                            $j + 8 + $q,
-                            $col_map + 2,
-                            $null, $ref_formats->{rows_fmt}
-                        );
-                        my $key =
-                          ($single_field->{keyposition} == 1)
-                          ? 'ДА'
-                          : 'НЕТ';
-                        $curr_job->write(
-                            $j + 8 + $q,
-                            $col_map + 3,
-                            $key, $ref_formats->{rows_fmt}
-                        );
+                        # $curr_job->write(
+                        # $j + 8 + $q,
+                        # $col_map + 2,
+                        # $null, $ref_formats->{rows_fmt}
+                        # );
+                        # my $key =
+                        # ($single_field->{keyposition} == 1)
+                        # ? 'ДА'
+                        # : 'НЕТ';
+                        # $curr_job->write(
+                        # $j + 8 + $q,
+                        # $col_map + 3,
+                        # $key, $ref_formats->{rows_fmt}
+                        # );
 
                         $q++;
                         $max = max_q($max, $q);
@@ -1044,6 +1047,7 @@ sub fill_excel_ai_increment_col_map {
     if (   defined $stage_prop->{InputName}
         || defined $stage_prop->{OutputName})
     {
+
         # $col_map = $col_map + 6;
         $col_map = $col_map + 10;
     }
@@ -1078,7 +1082,8 @@ sub fill_excel_stage_info {
             $stage_prop, $stage, $j);
         $max = fill_excel_ai_input_name($col, $stage_prop, $max, $col_map,
             $curr_job, $stages, $ref_formats, $j);
-			# $col_map=$col_map+2;
+
+        # $col_map=$col_map+2;
         $max = fill_excel_ai_output_name($col, $stage_prop, $max, $col_map,
             $curr_job, $stages, $ref_formats, $j);
         $col_map = fill_excel_ai_increment_col_map($col_map, $stage_prop);
@@ -1284,14 +1289,12 @@ sub fill_excel_stages_and_links {
     my $max             = 0;
     my $orig_col        = $col;
 
-    print DumpTree($all, 'all_fields');
+    # print DumpTree($all, 'all_fields');
 
 #сюда кладем те стадии, которые уже выводились в excel
 # my %painted = ();
 # my $save_col=0;
-#число стейджей всего:
-    my $cnt_ctages = 0 + @{$links};
-    say "number of stages: $cnt_ctages";
+
 
 =pod
 26 итого массив из 26 ячеек
@@ -1328,6 +1331,11 @@ stage_name=MART_UREP_WRH_DS
 #итак создаем нашу структуру
     my @roads = ();
 
+    my %start_stages_name = ();
+    my %a_few_stages      = ();
+    my $num_stages        = 0;
+    my $cnt_stages        = 0 + @{$links};
+    say "number of links: $cnt_stages";
     for my $stage (@{$links}) {
         my $is_dataset = 'no';
 
@@ -1348,15 +1356,26 @@ stage_name=MART_UREP_WRH_DS
 
             #высота текущей стадии, стейджа
             my $curr_j = $j + $max;
-            ($max, $col) =
-              fill_excel_inout_links($all, $orig_col, $j + $max, $stage);
+
+       #находим все начальные линки,их имена!!!
+            $a_few_stages{$stage->{stage_name}}++;
+
+            # $start_stages_name{$stage->{stage_name}}->{stage} = $stage;
+
+            # print DumpTree($links, '$links_$links');
+
+# #дальше правее должны пойти те стейджы (стадии, шаги, этапы по-русски)
+# #у которых $input_links входит в @$output_links
+ # my $ref_next_stages = get_next_stage_for_link($links, $stage, $direction);
+ # ($max, $col) =  fill_excel_inout_links($all, $orig_col, $j + $max, $stage);
+
+
             $max = max($max, 5);
             $j = $j + $max + 10;
 
-            my ($max, $col) =
-              fill_excel_next_stage($col, $curr_j, $max, $links, $all, $stage,
-                $direction);
-            $j = $curr_j + $max + 100;
+# my ($max, $col) =fill_excel_next_stage($col, $curr_j, $max, $links, $all, $stage,   $direction);
+# my ($max, $col) =fill_excel_next_stage_no_recurtion($col, $curr_j, $max, $links, $all, $stage,   $direction);
+            $j = $curr_j + $max;    # + 100;
 
             my %road_map = ();
 
@@ -1371,14 +1390,79 @@ stage_name=MART_UREP_WRH_DS
 
 
         }
-    }
-    print DumpTree(\@roads, '@roads');
 
-    my $ref_road = \@roads;
-    my $new_ref_road;
-    for my $stage_2_road (@{$links}) {
-        $new_ref_road = add_stage_to_road($ref_road, $stage_2_road);
+        my %link_collection = ();
+        for my $direction ('start', 'end') {
+            my $assoc_stages =
+              get_next_stage_for_link($links, $stage, $direction);
+            $link_collection{$direction} = $assoc_stages;
+
+            if ($stage->{stage_name} eq 'J01') {
+                p $assoc_stages;
+                print DumpTree($assoc_stages, 'assoc_stages');
+            }
+
+       # $start_stages_name{$stage->{stage_name}}->{$direction}=$assoc_stages;
+        }
+        $start_stages_name{$stage->{stage_name}} = \%link_collection;
+
+
+        say $stage->{stage_name} . ' cnt: ' . ++$num_stages;
+
     }
+
+
+    # print DumpTree(\%start_stages_name, '@start_stages_name');
+
+    # p %start_stages_name;
+
+#число стейджей всего:
+    my $cnt_ctages = 0 + @{$links};
+    say "number of stages: $cnt_ctages";
+
+#$cnt_ctages - это максимальное число вертикальных уровней или столбцов!!!
+    my @levels = ();
+
+    #строим нушу цепочку без рекурсии!!
+    #
+    my %lines = ();
+    foreach my $few_stage (sort keys %a_few_stages) {
+        say $few_stage;
+        $lines{$few_stage}++;
+        my @elements;
+        for (my $i = 1; $i <= $cnt_ctages; $i++) {
+            print "$i\n";
+            push @levels, $i;
+
+            # push @elements, $next_stage;
+        }
+        $lines{$few_stage} = \@levels;
+
+    }
+
+    p %lines;
+
+
+    foreach my $start_stage (sort keys %start_stages_name) {
+        say 'Dump!!';
+        p $start_stage;
+        p $start_stages_name{$start_stage};
+
+# for my $direction('start','end'){
+# my $stages=get_next_stage_for_link($links, $start_stage->{stage}, $direction);
+# }
+
+        # printf "%-8s %s\n", $start_stage, $start_stages_name{$start_stage};
+    }
+
+
+    # print DumpTree(\@roads, '@roads');
+
+    # my $ref_road = \@roads;
+    # my $new_ref_road;
+    # for my $stage_2_road (@{$links}) {
+    # $new_ref_road = add_stage_to_road($ref_road, $stage_2_road);
+    # }
 
 
 # print DumpTree( \@road_and_next, '@road_and_next' );
@@ -1425,6 +1509,44 @@ sub add_stage_to_road {
 #
 # New subroutine "fill_excel_next_stage" extracted - Fri Nov 21 11:19:14 2014.
 #
+sub fill_excel_next_stage_no_recurtion {
+    my ($col, $curr_j, $max, $links, $all, $stage, $direction) = @_;
+
+    # print DumpTree($links, '$links_$links');
+
+# #дальше правее должны пойти те стейджы (стадии, шаги, этапы по-русски)
+# #у которых $input_links входит в @$output_links
+  # my $ref_next_stages = get_next_stage_for_link($links, $stage, $direction);
+
+
+#выводим следующие по порядку стадии справа
+    # for my $next_stage (@{$ref_next_stages}) {
+    # ($max, $col) =
+    # fill_excel_inout_links($all, $col, $curr_j, $next_stage);
+    # $col++;
+    # my $ref_next_stages2 =
+    # get_next_stage_for_link($links, $next_stage, $direction);
+    # my $orig_col = $col;
+    # for my $next_stage2 (@{$ref_next_stages2}) {
+    # ($max, $col) =
+    # fill_excel_inout_links($all, $orig_col, $curr_j, $next_stage2);
+
+    # # $painted->{$stage->{stage_name}}++;
+    # my $ref_next_stages3 =
+    # get_next_stage_for_link($links, $next_stage2, $direction);
+
+# #($max, $col, $curr_j) =          fill_excel_next_stage2($col, $curr_j, $max, $links,   $next_stage2, $all, $ref_next_stages3, $direction);
+# }
+# $max = max($max, 5);
+# $curr_j = $curr_j + $max + 10;
+# }
+    return ($max, $col);
+}
+
+
+#
+# New subroutine "fill_excel_next_stage" extracted - Fri Nov 21 11:19:14 2014.
+#
 sub fill_excel_next_stage {
     my ($col, $curr_j, $max, $links, $all, $stage, $direction) = @_;
 
@@ -1451,9 +1573,7 @@ sub fill_excel_next_stage {
             my $ref_next_stages3 =
               get_next_stage_for_link($links, $next_stage2, $direction);
 
-            ($max, $col, $curr_j) =
-              fill_excel_next_stage2($col, $curr_j, $max, $links,
-                $next_stage2, $all, $ref_next_stages3, $direction);
+#($max, $col, $curr_j) =          fill_excel_next_stage2($col, $curr_j, $max, $links,   $next_stage2, $all, $ref_next_stages3, $direction);
         }
         $max = max($max, 5);
         $curr_j = $curr_j + $max + 10;
@@ -1517,8 +1637,8 @@ sub get_next_stage_for_link {
 
 #массив стадий, которые идут сразу за нашей
     my @next_stages = ();
-    my $i           = 0;
-    say "get_next_stage_for_link" . $i++;
+    state $i ;    #         = 0;
+    say "get_next_stage_for_link" . ++$i;
 
 #     print DumpTree( $links,           '$links' );
 
@@ -1608,23 +1728,24 @@ sub fill_excel_ai_header_mapping {
         );
         $curr_job->write($j + 8, $col_map + 1,
             "Datatype", $ref_formats->{map_fmt});
-			
-			        $curr_job->write($j + 8, $col_map + 2,
-            "nullable", $ref_formats->{map_fmt});
-        $curr_job->write($j + 8, $col_map + 3,
-            "keyposition", $ref_formats->{map_fmt});
+
+        # $curr_job->write($j + 8, $col_map + 2,
+        # "nullable", $ref_formats->{map_fmt});
+        # $curr_job->write($j + 8, $col_map + 3,
+        # "keyposition", $ref_formats->{map_fmt});
         $curr_job->write(
             $j + 8,
-            $col_map + 4,
+            $col_map + 2,
             "Source Column",
             $ref_formats->{map_fmt}
         );
-        $curr_job->write($j + 8, $col_map + 5,
+        $curr_job->write($j + 3, $col_map + 5,
             "Datatype", $ref_formats->{map_fmt});
-        $curr_job->write($j + 8, $col_map + 6,
-            "nullable", $ref_formats->{map_fmt});
-        $curr_job->write($j + 8, $col_map + 7,
-            "keyposition", $ref_formats->{map_fmt});
+
+        # $curr_job->write($j + 8, $col_map + 6,
+        # "nullable", $ref_formats->{map_fmt});
+        # $curr_job->write($j + 8, $col_map + 7,
+        # "keyposition", $ref_formats->{map_fmt});
     }
     return 1;
 }
@@ -1814,10 +1935,10 @@ sub fill_excel_stages {
       $job_and_formats->{job_pop}->{job_annotation_texts};
     my $ident_list = $job_and_formats->{job_pop}->{IdentList};
     my $fields_all = $job_and_formats->{job_pop}->{fields_all};
-	
-	print DumpTree( $fields_all, 'fields_all' );
-	print DumpTree( $stages, 'stages' );
-	
+
+    # print DumpTree($fields_all, 'fields_all');
+    # print DumpTree($stages,     'stages');
+
     my ($ref_formats, $curr_job, $job_pop) = (
         $job_and_formats->{ref_formats},
         $job_and_formats->{curr_job},
@@ -1834,19 +1955,21 @@ sub fill_excel_stages {
     $j = fill_excel_job_annotation_text($ref_formats, $curr_job,
         $ref_job_annotation_texts, $j);
 
-    $j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
+    #$j = fill_excel_stage_info($ref_formats, $curr_job, $col, $stages, $j);
     $j =
       fill_excel_activity_info($ref_formats, $curr_job, $col, $activity, $j);
     $j =
       fill_excel_ident_list($ref_formats, $curr_job, $col, $ident_list, $j);
-    $j =  fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
-    $j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
+    $j =
+      fill_excel_fields_all($ref_formats, $curr_job, $col, $fields_all, $j);
+
+    #$j = fill_excel_stage_fields($ref_formats, $curr_job, $col, $stages, $j);
 
 # $j = fill_excel_only_links($ref_formats, $curr_job, $col, $job_pop, $j);
 # $j = fill_excel_only_links($job_and_formats, $col, $j);
 # $j = fill_excel_stages_and_links($ref_formats, $curr_job, $col, $job_pop, $j);
-    $j =
-      fill_excel_stages_and_links($job_and_formats, $col, $j + 4, $direction);
+# $j =      fill_excel_stages_and_links($job_and_formats, $col, $j + 4, $direction);
+    $j = fill_excel_stages_and_links($job_and_formats, $col, $j, $direction);
 }
 
 sub fill_rev_history {
@@ -1875,28 +1998,29 @@ sub fill_excel_body {
 
     fill_rev_history($revision_history, $job_pop, $ref_formats, $workbook, $i,
         '1');
-    $i++;
-    fill_rev_history($revision_history, $job_pop, $ref_formats, $workbook, $i,
-        '2');
+
+#$i++;
+#fill_rev_history($revision_history, $job_pop, $ref_formats, $workbook, $i,     '2');
 
     my $curr_job_start =
       make_curr_job($job_pop, $ref_formats, $workbook, $i, '1');
 
-    my $curr_job_end =
-      make_curr_job($job_pop, $ref_formats, $workbook, $i, '2');
+#my $curr_job_end =   make_curr_job($job_pop, $ref_formats, $workbook, $i, '2');
 
     my %job_and_formats_start;
-    my %job_and_formats_end;
+
+    #my %job_and_formats_end;
     @job_and_formats_start{'ref_formats', 'curr_job', 'job_pop'} =
       ($ref_formats, $curr_job_start, $job_pop);
 
-    @job_and_formats_end{'ref_formats', 'curr_job', 'job_pop'} =
-      ($ref_formats, $curr_job_end, $job_pop);
+#@job_and_formats_end{'ref_formats', 'curr_job', 'job_pop'} =      ($ref_formats, $curr_job_end, $job_pop);
 
     fill_excel_stages(\%job_and_formats_start, 'start');
-    fill_excel_stages(\%job_and_formats_end,   'end');
+
+    #fill_excel_stages(\%job_and_formats_end,   'end');
     autofit_columns($curr_job_start);
-    autofit_columns($curr_job_end);
+
+    #autofit_columns($curr_job_end);
 }
 
 sub make_curr_job {
