@@ -2050,19 +2050,20 @@ sub fill_excel_body {
     my $curr_job_start =
       make_curr_job( $job_pop, $ref_formats, $workbook, $i, '1' );
 
-#my $curr_job_end =   make_curr_job($job_pop, $ref_formats, $workbook, $i, '2');
+my $curr_job_end =   make_curr_job($job_pop, $ref_formats, $workbook, $i, '2');
 
     my %job_and_formats_start;
 
-    #my %job_and_formats_end;
+    
     @job_and_formats_start{ 'ref_formats', 'curr_job', 'job_pop' } =
       ( $ref_formats, $curr_job_start, $job_pop );
-
-#@job_and_formats_end{'ref_formats', 'curr_job', 'job_pop'} =      ($ref_formats, $curr_job_end, $job_pop);
+      
+my %job_and_formats_end;
+@job_and_formats_end{'ref_formats', 'curr_job', 'job_pop'} =      ($ref_formats, $curr_job_end, $job_pop);
 
     fill_excel_stages( \%job_and_formats_start, 'start' );
 
-    #fill_excel_stages(\%job_and_formats_end,   'end');
+    fill_excel_stages(\%job_and_formats_end,   'end');
     autofit_columns($curr_job_start);
 
     #autofit_columns($curr_job_end);
