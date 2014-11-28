@@ -21,7 +21,8 @@ use Data::Printer {
 };
 use Data::TreeDumper;
 use Hash::Merge qw( merge );
-use Smart::Comments;
+
+#use Smart::Comments;
 
 #-------------------------------------------------------------------
 # package setup data
@@ -1281,7 +1282,7 @@ sub show_stage_prop {
 #
 sub fill_excel_stages_and_links {
     my ( $all, $col, $j, $direction ) = @_;
-    
+
     my $links = $all->{job_pop}->{only_links}->{only_stages_and_links};
     my @start_stages = ( 'copy', 'pxbridge' );
     my %start_stages_of = map { $_ => 1 } @start_stages;
@@ -1333,7 +1334,8 @@ stage_name=MART_UREP_WRH_DS
     my %a_few_stages      = ();
     my $num_stages        = 0;
     my $cnt_stages        = 0 + @{$links};
-    say "number of links: $cnt_stages";
+
+    #    say "number of links: $cnt_stages";
     for my $stage ( @{$links} ) {
         my $is_dataset = 'no';
 
@@ -1393,16 +1395,16 @@ stage_name=MART_UREP_WRH_DS
               get_next_stage_for_link( $links, $stage, $direction );
             $link_collection{$direction} = $assoc_stages;
 
-            if ( $stage->{stage_name} eq 'J01' ) {
-                p $assoc_stages;
-                print DumpTree( $assoc_stages, 'assoc_stages' );
-            }
+            #       if ( $stage->{stage_name} eq 'J01' ) {
+            #           p $assoc_stages;
+            #           print DumpTree( $assoc_stages, 'assoc_stages' );
+            #      }
 
          # $start_stages_name{$stage->{stage_name}}->{$direction}=$assoc_stages;
         }
         $start_stages_name{ $stage->{stage_name} } = \%link_collection;
 
-        say $stage->{stage_name} . ' cnt: ' . ++$num_stages;
+        #say $stage->{stage_name} . ' cnt: ' . ++$num_stages;
 
     }
 
@@ -1412,7 +1414,8 @@ stage_name=MART_UREP_WRH_DS
 
     #число стейджей всего:
     my $cnt_ctages = 0 + @{$links};
-    say "number of stages: $cnt_ctages";
+
+    #say "number of stages: $cnt_ctages";
 
 #$cnt_ctages - это максимальное число вертикальных уровней или столбцов!!!
 
@@ -1422,56 +1425,62 @@ stage_name=MART_UREP_WRH_DS
     my %lines = ();
     foreach my $few_stage ( sort keys %a_few_stages ) {
         $lines{$few_stage}++;
-        my @elements = ();
-        my @levels   = ();
-        for ( my $i = 0 ; $i < $cnt_ctages*2 ; $i++ ) {
+        my @elements   = ();
+        my @levels     = ();
+        my %in_already = ();
+        for ( my $i = 0 ; $i < $cnt_ctages ; $i++ ) {
             my %stages_in_level    = ();
             my %collect_stages     = ();
             my $ref_collect_stages = \%collect_stages;
-            print "$i\n";
+
+            #print "$i\n";
             if ( $i == 0 ) {
-
-                #say 'We_are_here!!: $i == 0';
                 $collect_stages{$few_stage} = 1;
+                $in_already{$few_stage}++;
+                push @levels, \%collect_stages;
 
-                #$ref_collect_stages = \%collect_stages;
-                push @levels,
-                  \%collect_stages;    #$ref_collect_stages;#\%collect_stages;
-
-                say
-"Первый элемент: @{[ sort keys %collect_stages ]}\n";
+         #say "Первый элемент: @{[ sort keys %collect_stages ]}\n";
                 my $ref_0_stages =
                   get_next_stage_in_hash( $few_stage, \%start_stages_name,
                     $direction );
                 push @levels, $ref_0_stages;
-                say
-"Второй элемент: @{[ sort keys %{$ref_0_stages} ]}\n";
+                foreach my $stg ( keys %{$ref_0_stages} ) {
+                    $in_already{$stg}++;
+                }
+
+        #say "Второй элемент: @{[ sort keys %{$ref_0_stages} ]}\n";
             }
             elsif ( $i > 1 ) {
                 my $prev_stages = $levels[ $i - 1 ];
-
                 foreach my $prev_stage ( sort keys %{$prev_stages} ) {
                     my $ref_stages =
                       get_next_stage_in_hash( $prev_stage, \%start_stages_name,
                         $direction );
-
-                    #   say 'Поехали!!:';
-                    #   p $ref_stages;
-                    #  print DumpTree( $ref_stages, '$ref_stages' );
                     $ref_collect_stages =
                       merge( $ref_collect_stages, $ref_stages );   #$ref_stages;
 
                 }
-                
-say "Третий элемент: @{[ sort keys %{$ref_collect_stages} ]}\n";                
+                my %hash_for_check = %{$ref_collect_stages};
 
-                #print DumpTree( $ref_collect_stages, '$ref_collect_stages' );
-                #                push @levels, $i;
+#проверяем получившийся хэш на стейджи, которые уже были
+                foreach my $stg2 ( keys %hash_for_check ) {
+                    if ( defined $in_already{$stg2} ) {
+                        delete $hash_for_check{$stg2};
+                    }
+
+                }
+
+                $ref_collect_stages = \%hash_for_check;
+                if ( !%{$ref_collect_stages} ) {
+                    last;
+                }
+                push @levels, $ref_collect_stages;    #\%collect_stages;
+                foreach my $stg3 ( keys %{$ref_collect_stages} ) {
+                    $in_already{$stg3}++;
+                }
+
+#               say "Третий элемент: @{[ sort keys %{$ref_collect_stages} ]}\n";
             }
-
-            #print DumpTree( $ref_collect_stages, '$ref_collect_stages' );
-
-            push @levels, $ref_collect_stages;    #\%collect_stages;
         }
         $lines{$few_stage} = \@levels;
     }
@@ -1480,9 +1489,9 @@ say "Третий элемент: @{[ sort keys %{$ref_collect_stages} ]}\n";
 #для 1 го уровня 0 элемент название стейджа совпадает с самим начальным стейджем
 #$level[0]=$few_stage;
 
-    say 'DEBUUG!! :';
-### %lines
-    p %lines;
+    #  say 'DEBUUG!! :';
+## %lines
+    #   p %lines;
     print DumpTree( \%lines, '%lines' );
 
     #p %lines;
@@ -1495,7 +1504,6 @@ say "Третий элемент: @{[ sort keys %{$ref_collect_stages} ]}\n";
 # for my $direction('start','end'){
 # my $stages=get_next_stage_for_link($links, $start_stage->{stage}, $direction);
 # }
-
 
     $j = $j + 4 + $max;
     return $j;
@@ -1511,7 +1519,8 @@ sub get_next_stage_in_hash {
     my $ref_link_array    = $ref_start_stages_name->{$prev_stage}->{$direction};
     my %stage_collections = ();
     for my $link ( @{$ref_link_array} ) {
-        say $link->{stage_name};
+
+        #       say $link->{stage_name};
         $stage_collections{ $link->{stage_name} }++;
     }
     return \%stage_collections;
@@ -1672,8 +1681,9 @@ sub get_next_stage_for_link {
 
   #массив стадий, которые идут сразу за нашей
     my @next_stages = ();
-    state $i ;    #         = 0;
-    say "get_next_stage_for_link" . ++$i;
+
+    #    state $i ;    #         = 0;
+    #    say "get_next_stage_for_link" . ++$i;
 
     #     print DumpTree( $links,           '$links' );
 
