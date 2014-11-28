@@ -1421,7 +1421,7 @@ stage_name=MART_UREP_WRH_DS
     say "number of stages: $cnt_ctages";
 
 #$cnt_ctages - это максимальное число вертикальных уровней или столбцов!!!
-    my @levels = ();
+
 
     #строим нушу цепочку без рекурсии!!
     #
@@ -1429,17 +1429,32 @@ stage_name=MART_UREP_WRH_DS
     foreach my $few_stage (sort keys %a_few_stages) {
         say $few_stage;
         $lines{$few_stage}++;
-        my @elements;
-        for (my $i = 1; $i <= $cnt_ctages; $i++) {
+        my @elements = ();
+        my @levels   = ();
+        for (my $i = 0; $i < $cnt_ctages; $i++) {
+		my @stages_in_level=();
             print "$i\n";
-            push @levels, $i;
+            if ($i == 0) {
+			push @stages_in_level,$few_stage;
+                push @levels, \@stages_in_level;
+            }
+            else {
+                push @levels, $i;
+            }
 
             # push @elements, $next_stage;
         }
+
+        # $levels[0]=$few_stage;
         $lines{$few_stage} = \@levels;
 
     }
 
+#есть 10 уровней
+#для 1 го уровня 0 элемент название стейджа совпадает с самим начальным стейджем
+#$level[0]=$few_stage;
+
+say 'DEBUUG!! :';
     p %lines;
 
 
