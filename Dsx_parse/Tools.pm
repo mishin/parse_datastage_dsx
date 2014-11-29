@@ -1491,7 +1491,28 @@ stage_name=MART_UREP_WRH_DS
 
     #  say 'DEBUUG!! :';
 ## %lines
-    #   p %lines;
+ #      p %lines;
+          foreach my $road ( keys %lines ) {
+			  #p $road;
+			  print DumpTree( $road, '$road' );
+			  print DumpTree( $lines{$road}, '$lines{$road}' );
+#			  print DumpTree( %start_stages_name, '%start_stages_name' );
+			  #start_stages_name
+			  foreach my $draw_stage(@{$lines{$road}}){
+#my                         $stage=$start_stages_name{$draw_stage};
+     #($max, $col) =  fill_excel_inout_links($all, $orig_col, $j + $max, $stage);
+
+      #    $max = max( $max, 5 );
+      #     $j = $j + $max + 10;
+}
+                }
+
+
+# my ($max, $col) =fill_excel_next_stage($col, $curr_j, $max, $links, $all, $stage,   $direction);
+# my ($max, $col) =fill_excel_next_stage_no_recurtion($col, $curr_j, $max, $links, $all, $stage,   $direction);
+#            $j = $curr_j + $max;    # + 100;
+
+    
     print DumpTree( \%lines, '%lines' );
 
     #p %lines;
