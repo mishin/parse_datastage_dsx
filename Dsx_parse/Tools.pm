@@ -1414,7 +1414,32 @@ stage_name=MART_UREP_WRH_DS
 
     }
 
-    # print DumpTree(\%start_stages_name, '@start_stages_name');
+    my ($lines) =
+      calculate_right_way_for_stages( $max, $all, $direction, $links, $col,
+        $orig_col, $j, \%a_few_stages, \%start_stages_name );
+
+    print DumpTree( $lines, '$hash_ref_lines and direction: ' . $direction );
+
+    $j = $j + 4 + $max;
+    return $j;
+}
+
+#
+# New subroutine "calculate_right_way_for_stages" extracted - Mon Dec  1 01:36:32 2014.
+#
+sub calculate_right_way_for_stages {
+    my $max       = shift;
+    my $all       = shift;
+    my $direction = shift;
+    my $links     = shift;
+    my $col       = shift;
+
+    my $orig_col              = shift;
+    my $j                     = shift;
+    my $ref_a_few_stages      = shift;
+    my $ref_start_stages_name = shift;
+
+    # print DumpTree(\%start_stages_name, '@$start_stages_name');
 
     # p %start_stages_name;
 
@@ -1425,11 +1450,11 @@ stage_name=MART_UREP_WRH_DS
 
 #$cnt_ctages - это максимальное число вертикальных уровней или столбцов!!!
 
-    #строим нушу цепочку без рекурсии!!
+    #строим нашу цепочку без рекурсии!!
     #
     enc_terminal();
     my %lines = ();
-    foreach my $few_stage ( sort keys %a_few_stages ) {
+    foreach my $few_stage ( sort keys %{$ref_a_few_stages} ) {
         $lines{$few_stage}++;
         my @elements   = ();
         my @levels     = ();
@@ -1447,7 +1472,7 @@ stage_name=MART_UREP_WRH_DS
 
          #say "Первый элемент: @{[ sort keys %collect_stages ]}\n";
                 my $ref_0_stages =
-                  get_next_stage_in_hash( $few_stage, \%start_stages_name,
+                  get_next_stage_in_hash( $few_stage, $ref_start_stages_name,
                     $direction );
                 push @levels, $ref_0_stages;
                 foreach my $stg ( keys %{$ref_0_stages} ) {
@@ -1459,9 +1484,8 @@ stage_name=MART_UREP_WRH_DS
             elsif ( $i > 1 ) {
                 my $prev_stages = $levels[ $i - 1 ];
                 foreach my $prev_stage ( sort keys %{$prev_stages} ) {
-                    my $ref_stages =
-                      get_next_stage_in_hash( $prev_stage, \%start_stages_name,
-                        $direction );
+                    my $ref_stages = get_next_stage_in_hash( $prev_stage,
+                        $ref_start_stages_name, $direction );
                     $ref_collect_stages =
                       merge( $ref_collect_stages, $ref_stages );   #$ref_stages;
 
@@ -1492,15 +1516,11 @@ stage_name=MART_UREP_WRH_DS
     }
 
     # my %var_4_show = ();
-    # @var_4_show{ 'j', 'col', 'all', 'orig_col', 'max', 'lines',
+    # %@var_4_show->{ 'j', 'col', 'all', 'orig_col', 'max', 'lines',
     # 'stages_body' } =
     # ( $j, $col, $all, $orig_col, $max, \%lines, \%stages_body );
     # ( $max, $col ) = fill_road_to_excel( \%var_4_show );
-
-    print DumpTree( \%lines, '%lines' );
-
-    $j = $j + 4 + $max;
-    return $j;
+    return ( \%lines );
 }
 
 #
