@@ -21,6 +21,7 @@ use Data::Printer {
 };
 use Data::TreeDumper;
 use Hash::Merge qw( merge );
+use Carp::Always;
 
 #use Smart::Comments;
 
@@ -1336,8 +1337,13 @@ stage_name=MART_UREP_WRH_DS
     my $cnt_stages        = 0 + @{$links};
 
     #    say "number of links: $cnt_stages";
+    #хэш стейджей с объектами
+    my %stages_body;
     for my $stage ( @{$links} ) {
         my $is_dataset = 'no';
+
+        #кладем
+        $stages_body{ $stage->{stage_name} } = $stage;
 
 #рахъясняющая переменная, не удалять, а то быдет плохо читаться код
         my $cnt_links = 0 + @{ $stage->{$links_type} };
@@ -1485,49 +1491,38 @@ stage_name=MART_UREP_WRH_DS
         $lines{$few_stage} = \@levels;
     }
 
-#есть 10 уровней
-#для 1 го уровня 0 элемент название стейджа совпадает с самим начальным стейджем
-#$level[0]=$few_stage;
+    # my %var_4_show = ();
+    # @var_4_show{ 'j', 'col', 'all', 'orig_col', 'max', 'lines',
+    # 'stages_body' } =
+    # ( $j, $col, $all, $orig_col, $max, \%lines, \%stages_body );
+    # ( $max, $col ) = fill_road_to_excel( \%var_4_show );
 
-    #  say 'DEBUUG!! :';
-## %lines
- #      p %lines;
-          foreach my $road ( keys %lines ) {
-			  #p $road;
-			  print DumpTree( $road, '$road' );
-			  print DumpTree( $lines{$road}, '$lines{$road}' );
-#			  print DumpTree( %start_stages_name, '%start_stages_name' );
-			  #start_stages_name
-			  foreach my $draw_stage(@{$lines{$road}}){
-#my                         $stage=$start_stages_name{$draw_stage};
-     #($max, $col) =  fill_excel_inout_links($all, $orig_col, $j + $max, $stage);
-
-      #    $max = max( $max, 5 );
-      #     $j = $j + $max + 10;
-}
-                }
-
-
-# my ($max, $col) =fill_excel_next_stage($col, $curr_j, $max, $links, $all, $stage,   $direction);
-# my ($max, $col) =fill_excel_next_stage_no_recurtion($col, $curr_j, $max, $links, $all, $stage,   $direction);
-#            $j = $curr_j + $max;    # + 100;
-
-    
     print DumpTree( \%lines, '%lines' );
-
-    #p %lines;
-
-    #foreach my $start_stage ( sort keys %start_stages_name ) {
-    #   say 'Dump!!';
-    #   p $start_stage;
-    #p $start_stages_name{$start_stage};
-
-# for my $direction('start','end'){
-# my $stages=get_next_stage_for_link($links, $start_stage->{stage}, $direction);
-# }
 
     $j = $j + 4 + $max;
     return $j;
+}
+
+#
+# New subroutine "fill_road_to_excel" extracted - Sun Nov 30 22:30:25 2014.
+#
+sub fill_road_to_excel {
+    my ($var_4_show) = @_;
+    my ( $max, $col );
+    foreach my $road ( keys %{ $var_4_show->{lines} } ) {
+
+        foreach my $draw_stage ( @{ $var_4_show->{lines}->{$road} } ) {
+
+            my $stage = $var_4_show->{stages_body}{$draw_stage};
+            ( $max, $col ) = fill_excel_inout_links(
+                $var_4_show->{all}, $var_4_show->{orig_col},
+                $var_4_show->{max}, $var_4_show->{stage}
+            );
+
+        }
+    }
+
+    return ( $max, $col );
 }
 
 sub get_next_stage_in_hash {
@@ -1680,10 +1675,8 @@ sub fill_excel_next_stage2 {
     }
     return ( $max, $col, $curr_j );
 }
-
-#sub fill_excel_next_stage2 {}
 #
-# New subroutine "get_next_stage" extracted - Thu Nov 21 10:27:27 2014.
+# New subroutine "get_next_stage_for_link" extracted - Thu Nov 21 10:27:27 2014.
 #
 sub get_next_stage_for_link {
     my ( $links, $stage, $direction ) = @_;
@@ -1733,6 +1726,25 @@ sub get_next_stage_for_link {
     #возвращаем ссылку на массив стадий
 
     return \@next_stages;
+}
+
+#sub fill_excel_next_stage2 {}
+#
+# New subroutine "get_body_of_stage" extracted - Thu Nov 21 10:27:27 2014.
+#
+sub get_body_of_stage {
+    my ( $links, $stage_name ) = @_;
+    my $stage_body;
+
+    #идем по всем стадиям
+    for my $loc_stage ( @{$links} ) {
+        if ( $loc_stage->{stage_name} eq $stage_name ) {
+            $stage_body = $loc_stage;
+        }
+
+    }
+
+    return $stage_body;
 }
 
 #
@@ -2071,20 +2083,21 @@ sub fill_excel_body {
     my $curr_job_start =
       make_curr_job( $job_pop, $ref_formats, $workbook, $i, '1' );
 
-my $curr_job_end =   make_curr_job($job_pop, $ref_formats, $workbook, $i, '2');
+    my $curr_job_end =
+      make_curr_job( $job_pop, $ref_formats, $workbook, $i, '2' );
 
     my %job_and_formats_start;
 
-    
     @job_and_formats_start{ 'ref_formats', 'curr_job', 'job_pop' } =
       ( $ref_formats, $curr_job_start, $job_pop );
-      
-my %job_and_formats_end;
-@job_and_formats_end{'ref_formats', 'curr_job', 'job_pop'} =      ($ref_formats, $curr_job_end, $job_pop);
+
+    my %job_and_formats_end;
+    @job_and_formats_end{ 'ref_formats', 'curr_job', 'job_pop' } =
+      ( $ref_formats, $curr_job_end, $job_pop );
 
     fill_excel_stages( \%job_and_formats_start, 'start' );
 
-    fill_excel_stages(\%job_and_formats_end,   'end');
+    fill_excel_stages( \%job_and_formats_end, 'end' );
     autofit_columns($curr_job_start);
 
     #autofit_columns($curr_job_end);

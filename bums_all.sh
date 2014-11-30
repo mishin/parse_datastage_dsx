@@ -1,1 +1,1 @@
-perl simple_parse.pl Parallel_SG_BCE_ACCRED.dsx > Parallel_SG_BCE_ACCRED.log 2>&1
+perl simple_parse.pl $1 > $1.log 2>&1
