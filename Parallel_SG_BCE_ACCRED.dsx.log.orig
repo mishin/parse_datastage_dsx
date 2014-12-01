@@ -1,0 +1,404 @@
+
+Found ServerName: SDBDS3 
+Found ProjectName: Kanov 
+Found ServerVersion: 8.1 
+We_are_in_the_JOB_RX2
+Found Orchestrate StageName: J01
+Found Orchestrate OperatorName: leftouterjoin
+Found Orchestrate StageName: T201
+Found Orchestrate OperatorName: transform
+Found Orchestrate StageName: T999
+Found Orchestrate OperatorName: transform
+Found Orchestrate StageName: SG_ACCRED
+Found Orchestrate OperatorName: pxbridge
+Found Orchestrate StageName: FICLI_CLIENTS
+Found Orchestrate OperatorName: pxbridge
+Found Orchestrate StageName: SG_BCE_ACCRED
+Found Orchestrate OperatorName: pxbridge
+Found Orchestrate StageName: T101
+Found Orchestrate OperatorName: transform
+Found Orchestrate StageName: T102
+Found Orchestrate OperatorName: transform
+Found Orchestrate StageName: FN01
+Found Orchestrate OperatorName: funnel
+Found Orchestrate StageName: J02
+Found Orchestrate OperatorName: innerjoin
+
+Found Parameter Name: PS_BCE_CONNECTIONS
+Found ParameterPrompt: PS_BCE_CONNECTIONS parameters 
+Found ParamType: Parameter Set 
+
+Found StageName: J01 
+
+Found OLEType CCustomStage 
+Found StageType: PxJoin 
+
+Found StageName: L102 
+
+Found OLEType CCustomInput 
+
+Found StageName: L01 
+
+Found OLEType CCustomInput 
+
+Found StageName: L103 
+
+Found OLEType CCustomOutput 
+
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found field_type 12 
+Found prec_value: 50 
+Found parsed_deriv: L102.AUTHORIZATION_IDENTIFIER 
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found sql_type: VarChar(50) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found field_name: AUTHORIZATION_CODE 
+Found field_type 12 
+Found prec_value: 5 
+Found parsed_deriv: L102.AUTHORIZATION_CODE 
+Found field_name: AUTHORIZATION_CODE 
+Found sql_type: VarChar(5) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found StageName: T201 
+
+Found OLEType CTransformerStage 
+Found StageType: CTransformerStage 
+Found in_out_param:define our input/output link names
+inputname 0 L201;
+outputname 0 L01;
+outputname 1 L202;
+
+Found input_name:L201 
+Found output_name:L01 
+Found output_name:L202 
+
+Found StageName: L201 
+
+Found OLEType CTrxInput 
+
+Found StageName: L01 
+
+Found OLEType CTrxOutput 
+
+Found StageName: L202 
+
+Found OLEType CTrxOutput 
+
+Found StageName: T999 
+
+Found OLEType CTransformerStage 
+Found StageType: CTransformerStage 
+Found in_out_param:define our input/output link names
+inputname 0 L401;
+outputname 0 L999;
+
+Found input_name:L401 
+Found output_name:L999 
+
+Found StageName: L401 
+
+Found OLEType CTrxInput 
+
+Found StageName: L999 
+
+Found OLEType CTrxOutput 
+
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found field_type 12 
+Found prec_value: 50 
+Found parsed_deriv: L401.AUTHORIZATION_IDENTIFIER 
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found sql_type: VarChar(50) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found field_name: AUTHORIZATION_CODE 
+Found field_type 12 
+Found prec_value: 5 
+Found parsed_deriv: L401.AUTHORIZATION_CODE 
+Found field_name: AUTHORIZATION_CODE 
+Found sql_type: VarChar(5) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found StageName: SG_ACCRED 
+
+Found OLEType CCustomStage 
+Found StageType: ODBCConnectorPX 
+
+Found StageName: L101 
+
+Found OLEType CCustomOutput 
+
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found field_type 12 
+Found prec_value: 50 
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found sql_type: VarChar(50) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found field_name: AUTHORIZATION_CODE 
+Found field_type 12 
+Found prec_value: 5 
+Found field_name: AUTHORIZATION_CODE 
+Found sql_type: VarChar(5) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found StageName: T101 
+
+Found OLEType CTransformerStage 
+Found StageType: CTransformerStage 
+Found in_out_param:define our input/output link names
+inputname 0 L101;
+outputname 0 L102;
+
+Found input_name:L101 
+Found output_name:L102 
+
+Found StageName: L101 
+
+Found OLEType CTrxInput 
+
+Found StageName: L102 
+
+Found OLEType CTrxOutput 
+
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found field_type 12 
+Found prec_value: 50 
+Found parsed_deriv: L101.AUTHORIZATION_IDENTIFIER 
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found sql_type: VarChar(50) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found field_name: AUTHORIZATION_CODE 
+Found field_type 12 
+Found prec_value: 5 
+Found parsed_deriv: L101.AUTHORIZATION_CODE 
+Found field_name: AUTHORIZATION_CODE 
+Found sql_type: VarChar(5) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found StageName: T102 
+
+Found OLEType CTransformerStage 
+Found StageType: CTransformerStage 
+Found in_out_param:define our input/output link names
+inputname 0 L103;
+outputname 0 L104;
+outputname 1 L105;
+
+Found input_name:L103 
+Found output_name:L104 
+Found output_name:L105 
+
+Found StageName: L103 
+
+Found OLEType CTrxInput 
+
+Found StageName: L104 
+
+Found OLEType CTrxOutput 
+
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found field_type 12 
+Found prec_value: 50 
+Found parsed_deriv: L103.AUTHORIZATION_IDENTIFIER 
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found sql_type: VarChar(50) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found field_name: AUTHORIZATION_CODE 
+Found field_type 12 
+Found prec_value: 5 
+Found parsed_deriv: L103.AUTHORIZATION_CODE 
+Found field_name: AUTHORIZATION_CODE 
+Found sql_type: VarChar(5) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found StageName: L105 
+
+Found OLEType CTrxOutput 
+
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found field_type 12 
+Found prec_value: 50 
+Found parsed_deriv: L103.AUTHORIZATION_IDENTIFIER 
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found sql_type: VarChar(50) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found field_name: AUTHORIZATION_CODE 
+Found field_type 12 
+Found prec_value: 5 
+Found parsed_deriv: L103.AUTHORIZATION_CODE 
+Found field_name: AUTHORIZATION_CODE 
+Found sql_type: VarChar(5) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found StageName: FN01 
+
+Found OLEType CCustomStage 
+Found StageType: PxFunnel 
+
+Found StageName: L301 
+
+Found OLEType CCustomInput 
+
+Found StageName: L104 
+
+Found OLEType CCustomInput 
+
+Found StageName: L401 
+
+Found OLEType CCustomOutput 
+
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found field_type 12 
+Found prec_value: 50 
+Found parsed_deriv: AUTHORIZATION_IDENTIFIER 
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found sql_type: VarChar(50) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found field_name: AUTHORIZATION_CODE 
+Found field_type 12 
+Found prec_value: 5 
+Found parsed_deriv: AUTHORIZATION_CODE 
+Found field_name: AUTHORIZATION_CODE 
+Found sql_type: VarChar(5) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found StageName: J02 
+
+Found OLEType CCustomStage 
+Found StageType: PxJoin 
+
+Found StageName: L105 
+
+Found OLEType CCustomInput 
+
+Found StageName: L202 
+
+Found OLEType CCustomInput 
+
+Found StageName: L301 
+
+Found OLEType CCustomOutput 
+
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found field_type 12 
+Found prec_value: 50 
+Found parsed_deriv: L105.AUTHORIZATION_IDENTIFIER 
+Found field_name: AUTHORIZATION_IDENTIFIER 
+Found sql_type: VarChar(50) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found field_name: AUTHORIZATION_CODE 
+Found field_type 12 
+Found prec_value: 5 
+Found parsed_deriv: L105.AUTHORIZATION_CODE 
+Found field_name: AUTHORIZATION_CODE 
+Found sql_type: VarChar(5) 
+Found nullable: 1 
+Found keyposition: 0 
+Found scale: 0 
+
+Found StageName: FICLI_CLIENTS 
+
+Found OLEType CCustomStage 
+Found StageType: ODBCConnectorPX 
+
+Found StageName: L201 
+
+Found OLEType CCustomOutput 
+
+Found StageName: SG_BCE_ACCRED 
+
+Found OLEType CCustomStage 
+Found StageType: ODBCConnectorPX 
+
+Found StageName: L999 
+
+Found OLEType CCustomInput 
+$hash_ref_lines and direction: start
+|- FICLI_CLIENTS  [A1]
+|  |- 0  [H2]
+|  |  `- FICLI_CLIENTS = 1  [S3]
+|  |- 1  [H4]
+|  |  `- T201 = 1  [S5]
+|  |- 2  [H6]
+|  |  |- J01 = 1  [S7]
+|  |  `- J02 = 1  [S8]
+|  |- 3  [H9]
+|  |  |- FN01 = 1  [S10]
+|  |  `- T102 = 1  [S11]
+|  |- 4  [H12]
+|  |  `- T999 = 1  [S13]
+|  `- 5  [H14]
+|     `- SG_BCE_ACCRED = 1  [S15]
+`- SG_ACCRED  [A16]
+   |- 0  [H17]
+   |  `- SG_ACCRED = 1  [S18]
+   |- 1  [H19]
+   |  `- T101 = 1  [S20]
+   |- 2  [H21]
+   |  `- J01 = 1  [S22]
+   |- 3  [H23]
+   |  `- T102 = 1  [S24]
+   |- 4  [H25]
+   |  |- FN01 = 1  [S26]
+   |  `- J02 = 1  [S27]
+   |- 5  [H28]
+   |  `- T999 = 1  [S29]
+   `- 6  [H30]
+      `- SG_BCE_ACCRED = 1  [S31]
+$hash_ref_lines and direction: end
+`- SG_BCE_ACCRED  [A1]
+   |- 0  [H2]
+   |  `- SG_BCE_ACCRED = 1  [S3]
+   |- 1  [H4]
+   |  `- T999 = 1  [S5]
+   |- 2  [H6]
+   |  `- FN01 = 1  [S7]
+   |- 3  [H8]
+   |  |- J02 = 1  [S9]
+   |  `- T102 = 1  [S10]
+   |- 4  [H11]
+   |  |- J01 = 1  [S12]
+   |  `- T201 = 1  [S13]
+   |- 5  [H14]
+   |  |- FICLI_CLIENTS = 1  [S15]
+   |  `- T101 = 1  [S16]
+   `- 6  [H17]
+      `- SG_ACCRED = 1  [S18]

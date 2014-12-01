@@ -1278,19 +1278,7 @@ sub show_stage_prop {
     return $max;
 }
 
-#
-# New subroutine "fill_excel_stages_and_links" extracted - Wed Nov 5 16:12:45 2014.
-#
-sub fill_excel_stages_and_links {
-    my ( $all, $col, $j, $direction ) = @_;
-
-    my $links = $all->{job_pop}->{only_links}->{only_stages_and_links};
-    my @start_stages = ( 'copy', 'pxbridge' );
-    my %start_stages_of = map { $_ => 1 } @start_stages;
-    my $max             = 0;
-    my $orig_col        = $col;
-
-    # print DumpTree($all, 'all_fields');
+# print DumpTree($all, 'all_fields');
 
 #сюда кладем те стадии, которые уже выводились в excel
 # my %painted = ();
@@ -1324,102 +1312,85 @@ stage_name=MART_UREP_WRH_DS
         print DumpTree( $stage->{input_links},  '$stage->{input_links}' );
         print DumpTree( $stage->{output_links}, '$stage->{output_links}' );
 
+            #высота текущей стадии, стейджа
+            my $curr_j = $j + $max;
+
 =cut
 
+sub check_for_dataset {
+    my ( $cnt_links, $stage, $links_type ) = @_;
+
+#также, если стейдж типа ds или это источник в виде базы данных 'pxbridge'
+#у которого нет входящих линков для 1-го и выходящих для последнего
+#точки приземления! (Андрей Бабуров)
+
+    my $is_dataset = 'no';
+
+    #кладем
+    if ( $cnt_links == 1
+        && substr( ${ $stage->{$links_type} }[0], -2 ) eq 'ds' )
+    {
+        $is_dataset = 'yes';
+    }
+    return $is_dataset;
+}
+
+sub check_for_started {
+    my ( $cnt_links, $stage, $ref_start_stages_of ) = @_;
+    return (
+        (
+            exists $ref_start_stages_of->{ $stage->{operator_name} }
+              && $cnt_links == 0
+        )
+          || ( $is_dataset eq 'yes' )
+    );
+
+}
+
+#
+# New subroutine "fill_excel_stages_and_links" extracted - Wed Nov 5 16:12:45 2014.
+#
+
+sub fill_excel_stages_and_links {
+    my ( $all, $col, $j, $direction ) = @_;
+
+    my $links = $all->{job_pop}->{only_links}->{only_stages_and_links};
+    my @start_stages = ( 'copy', 'pxbridge' );
+    my %start_stages_of = map { $_ => 1 } @start_stages;
+    my $max             = 0;
+    my $orig_col        = $col;
     my $links_type = ( $direction eq 'start' ) ? 'input_links' : 'output_links';
-
-    #итак создаем нашу структуру
-    my @roads = ();
-
     my %start_stages_name = ();
     my %a_few_stages      = ();
-    my $num_stages        = 0;
     my $cnt_stages        = 0 + @{$links};
 
     #    say "number of links: $cnt_stages";
     #хэш стейджей с объектами
     my %stages_body;
     for my $stage ( @{$links} ) {
-        my $is_dataset = 'no';
-
-        #кладем
         $stages_body{ $stage->{stage_name} } = $stage;
-
-#рахъясняющая переменная, не удалять, а то быдет плохо читаться код
         my $cnt_links = 0 + @{ $stage->{$links_type} };
-        if ( $cnt_links == 1
-            && substr( ${ $stage->{$links_type} }[0], -2 ) eq 'ds' )
-        {
-            $is_dataset = 'yes';
-        }
 
-#также, если стейдж типа ds или это источник в виде базы данных 'pxbridge'
-#у которого нет входящих линков для 1-го и выходящих для последнего
-#точки приземления! (Андрей Бабуров)
-        if ( ( $start_stages_of{ $stage->{operator_name} } && $cnt_links == 0 )
-            || ( $is_dataset eq 'yes' ) )
-        {
+        my $is_dataset = check_for_dataset( $cnt_links, $stage, $links_type );
+        my $is_started_links =
+          check_for_started( $cnt_links, $stage, \%start_stages_of );
 
-            #высота текущей стадии, стейджа
-            my $curr_j = $j + $max;
+        if ( $is_started_links ) {
 
          #находим все начальные линки,их имена!!!
             $a_few_stages{ $stage->{stage_name} }++;
-
-            # $start_stages_name{$stage->{stage_name}}->{stage} = $stage;
-
-            # print DumpTree($links, '$links_$links');
-
-# #дальше правее должны пойти те стейджы (стадии, шаги, этапы по-русски)
-# #у которых $input_links входит в @$output_links
-# my $ref_next_stages = get_next_stage_for_link($links, $stage, $direction);
-# ($max, $col) =  fill_excel_inout_links($all, $orig_col, $j + $max, $stage);
-
-            $max = max( $max, 5 );
-            $j = $j + $max + 10;
-
-# my ($max, $col) =fill_excel_next_stage($col, $curr_j, $max, $links, $all, $stage,   $direction);
-# my ($max, $col) =fill_excel_next_stage_no_recurtion($col, $curr_j, $max, $links, $all, $stage,   $direction);
-            $j = $curr_j + $max;    # + 100;
-
-            my %road_map = ();
-
-            # print DumpTree( $stage, '$stage_find_links_type' );
-            $road_map{number_in_road}  = 0;
-            $road_map{stage_name}      = $stage->{stage_name};
-            $road_map{last_stage}      = $stage->{stage_name};
-            $road_map{last_links}      = $stage->{$links_type};
-            $road_map{last_links_type} = $links_type;
-            $road_map{orig_stage}      = $stage;
-            push @roads, \%road_map;
-
         }
-
         my %link_collection = ();
         for my $direction ( 'start', 'end' ) {
             my $assoc_stages =
               get_next_stage_for_link( $links, $stage, $direction );
             $link_collection{$direction} = $assoc_stages;
-
-            #       if ( $stage->{stage_name} eq 'J01' ) {
-            #           p $assoc_stages;
-            #           print DumpTree( $assoc_stages, 'assoc_stages' );
-            #      }
-
-         # $start_stages_name{$stage->{stage_name}}->{$direction}=$assoc_stages;
         }
         $start_stages_name{ $stage->{stage_name} } = \%link_collection;
-
-        #say $stage->{stage_name} . ' cnt: ' . ++$num_stages;
-
     }
-
     my ($lines) =
       calculate_right_way_for_stages( $max, $all, $direction, $links, $col,
         $orig_col, $j, \%a_few_stages, \%start_stages_name );
-
-    print DumpTree( $lines, '$hash_ref_lines and direction: ' . $direction );
-
     $j = $j + 4 + $max;
     return $j;
 }
@@ -1520,6 +1491,9 @@ sub calculate_right_way_for_stages {
     # 'stages_body' } =
     # ( $j, $col, $all, $orig_col, $max, \%lines, \%stages_body );
     # ( $max, $col ) = fill_road_to_excel( \%var_4_show );
+
+    print DumpTree( \%lines, '$hash_ref_lines and direction: ' . $direction );
+
     return ( \%lines );
 }
 
