@@ -1,0 +1,4550 @@
+BEGIN HEADER
+   CharacterSet "CP1251"
+   ExportingTool "IBM Websphere DataStage Export"
+   ToolVersion "8"
+   ServerName "SDBDS2"
+   ToolInstanceID "MASTER_for_CDB"
+   MDISVersion "1.0"
+   Date "2014-12-15"
+   Time "17.23.21"
+   ServerVersion "8.1"
+END HEADER
+BEGIN DSJOB
+   Identifier "gr_address_insert"
+   DateModified "2010-09-24"
+   TimeModified "13.33.49"
+   BEGIN DSRECORD
+      Identifier "ROOT"
+      OLEType "CJobDefn"
+      Readonly "1"
+      Name "gr_address_insert"
+      NextID "7"
+      Container "V0"
+      JobVersion "50.0.0"
+      ControlAfterSubr "0"
+      Parameters "CParameters"
+      BEGIN DSSUBRECORD
+         Name "PS_CONNECTIONS"
+         Prompt "PS_CONNECTIONS parameters"
+         Default "(As pre-defined)"
+         HelpTxt "\(421)\(43E)\(435)\(434)\(438)\(43D)\(435)\(43D)\(438)\(44F) - \(43D)\(430)\(431)\(43E)\(440) \(43F)\(430)\(440)\(430)\(43C)\(435)\(442)\(440)\(43E)\(432)"
+         ParamType "13"
+         ParamLength "0"
+         ParamScale "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "AdvancedRuntimeOptions"
+         Value "#DSProjectARTOptions#"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "IdentList"
+         Value "to_tables|LO|ADR|IP_X_LO|get_loid|address_loid|NEW_ADRESS_FOR_KLADR"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "ClientCodePage"
+         Value "1251"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceMode"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceSeq"
+         Value "1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceRecords"
+         Value "100"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceSkip"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TracePeriod"
+         Value "1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RecordJobPerformanceData"
+         Value "0"
+      END DSSUBRECORD
+      NULLIndicatorPosition "0"
+      OrchestrateCode =+=+=+=
+#################################################################
+#### STAGE: to_tables
+## Operator
+transform
+## Operator options
+-flag run
+-name 'V0S3_gr_address_insert_to_tables'
+
+## General options
+[ident('to_tables'); jobmon_ident('to_tables')]
+## Inputs
+0< [] 'get_loid:address_insert.v'
+## Outputs
+0> [] 'to_tables:to_lo.v'
+1> [] 'to_tables:to_adr.v'
+2> [] 'to_tables:to_pst_adr.v'
+3> [] 'to_tables:to_ip_x_lo.v'
+;
+
+#################################################################
+#### STAGE: LO
+## Operator
+pxbridge
+## Operator options
+-XMLProperties '<?xml version=\\'1.0\\' encoding=\\'UTF-16\\'?><Properties version=\\'1.1\\'><Common><Context type=\\'int\\'>2</Context><Variant type=\\'string\\'>3.5</Variant><DescriptorVersion type=\\'string\\'>1.0</DescriptorVersion><PartitionType type=\\'int\\'>-1</PartitionType></Common><Connection><DataSource modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_DSN"]]]></DataSource><Username modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_LOGIN"]]]></Username><Password modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_PASSWORD"]]]></Password></Connection><Usage><WriteMode type=\\'int\\'><![CDATA[0]]></WriteMode><GenerateSQL modified=\\'1\\' type=\\'bool\\'><![CDATA[1]]></GenerateSQL><TableName modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_SCHEME"].lo]]></TableName><EnableQuotedIDs type=\\'bool\\'><![CDATA[0]]></EnableQuotedIDs><SQL></SQL><TableAction collapsed=\\'1\\' type=\\'int\\'><![CDATA[0]]></TableAction><Transaction><RecordCount type=\\'int\\'><![CDATA[2000]]></RecordCount></Transaction><Session><IsolationLevel type=\\'int\\'><![CDATA[1]]></IsolationLevel><AutocommitMode type=\\'int\\'><![CDATA[0]]></AutocommitMode><ArraySize type=\\'int\\'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type=\\'bool\\'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type=\\'bool\\'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><CodePage collapsed=\\'1\\' type=\\'int\\'><![CDATA[0]]></CodePage></Session><BeforeAfter collapsed=\\'1\\' type=\\'bool\\'><![CDATA[0]]></BeforeAfter></Usage></Properties >'
+-connector '{
+   variant=3.5, 
+   library=ccodbc, 
+   version=1.0, 
+   variantlist='3.5', 
+   versionlist='1.0', 
+   name=ODBCConnector
+}'
+-target 0 '{
+      DSDescription={LO_ID=\\'\\<none\\>\\', PPN_DT=\\'\\<none\\>\\', PPN_TM=\\'\\<none\\>\\', SRC_STM_ID=\\'\\<none\\>\\', UNQ_ID_SRC_STM=\\'\\<none\\>\\', PRN_LO_ID=\\'\\<none\\>\\', LO_NM=\\'\\<none\\>\\', DSC=\\'\\<none\\>\\', LO_TP_ID=\\'\\<none\\>\\'}, 
+      DSIsKey={LO_ID=1}, 
+      DSDisplayWidth={LO_ID=11, PPN_DT=10, PPN_TM=8, SRC_STM_ID=6, UNQ_ID_SRC_STM=20, PRN_LO_ID=11, LO_NM=32, DSC=256, LO_TP_ID=6}, 
+      DSSQLType={LO_ID=4, PPN_DT=9, PPN_TM=10, SRC_STM_ID=5, UNQ_ID_SRC_STM=1, PRN_LO_ID=4, LO_NM=1, DSC=12, LO_TP_ID=5}, 
+      DSDerivation={LO_ID=\\'address_insert\\.LO_ID\\', PPN_DT=\\'CurrentDate()\\', PPN_TM=\\'CurrentTime()\\', SRC_STM_ID=\\'33\\', UNQ_ID_SRC_STM=\\'Trim(address_insert\\.UNQ_ID_SRC_STM)\\', PRN_LO_ID=\\'SetNull()\\', LO_NM=\\'TrimLeadingTrailing (NullToEmpty(address_insert\\.STRNAM)) \\:TrimLeadingTrailing (NullToEmpty(address_insert\\.HOUSE)) \\:TrimLeadingTrailing (NullToEmpty(address_insert\\.CORP)) \\:TrimLeadingTrailing (NullToEmpty(address_insert\\.FLAT))\\', DSC=\\'address_insert\\.DSC\\', LO_TP_ID=\\'32\\'}, 
+      DSSQLPrecision={LO_ID=10, PPN_DT=10, PPN_TM=8, SRC_STM_ID=5, UNQ_ID_SRC_STM=20, PRN_LO_ID=10, LO_NM=32, DSC=256, LO_TP_ID=5}, 
+      DSSchema=\\'record
+         (
+           LO_ID\\:int32\\;
+           PPN_DT\\:date\\;
+           PPN_TM\\:time\\;
+           SRC_STM_ID\\:int16\\;
+           UNQ_ID_SRC_STM\\:string\\[20\\]\\;
+           PRN_LO_ID\\:nullable int32\\;
+           LO_NM\\:string\\[32\\]\\;
+           DSC\\:string\\[max\\=256\\]\\;
+           LO_TP_ID\\:int16\\;
+         )\\'
+}'
+   
+
+## General options
+[ident('LO'); jobmon_ident('LO')]
+## Inputs
+0< [] 'to_tables:to_lo.v'
+;
+
+#################################################################
+#### STAGE: ADR
+## Operator
+pxbridge
+## Operator options
+-XMLProperties '<?xml version=\\'1.0\\' encoding=\\'UTF-16\\'?><Properties version=\\'1.1\\'><Common><Context type=\\'int\\'>2</Context><Variant type=\\'string\\'>3.5</Variant><DescriptorVersion type=\\'string\\'>1.0</DescriptorVersion><PartitionType type=\\'int\\'>-1</PartitionType></Common><Connection><DataSource modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_DSN"]]]></DataSource><Username modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_LOGIN"]]]></Username><Password modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_PASSWORD"]]]></Password></Connection><Usage><WriteMode type=\\'int\\'><![CDATA[0]]></WriteMode><GenerateSQL modified=\\'1\\' type=\\'bool\\'><![CDATA[1]]></GenerateSQL><TableName modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_SCHEME"].adr]]></TableName><EnableQuotedIDs type=\\'bool\\'><![CDATA[0]]></EnableQuotedIDs><SQL></SQL><TableAction collapsed=\\'1\\' type=\\'int\\'><![CDATA[0]]></TableAction><Transaction><RecordCount type=\\'int\\'><![CDATA[2000]]></RecordCount></Transaction><Session><IsolationLevel type=\\'int\\'><![CDATA[1]]></IsolationLevel><AutocommitMode type=\\'int\\'><![CDATA[0]]></AutocommitMode><ArraySize type=\\'int\\'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type=\\'bool\\'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type=\\'bool\\'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><CodePage collapsed=\\'1\\' type=\\'int\\'><![CDATA[0]]></CodePage></Session><BeforeAfter collapsed=\\'1\\' type=\\'bool\\'><![CDATA[0]]></BeforeAfter></Usage></Properties >'
+-connector '{
+   variant=3.5, 
+   library=ccodbc, 
+   version=1.0, 
+   variantlist='3.5', 
+   versionlist='1.0', 
+   name=ODBCConnector
+}'
+-target 0 '{
+      DSSQLType={ADR_ID=4, ADR_TP_ID=5}, 
+      DSDerivation={ADR_ID=\\'address_insert\\.LO_ID\\', ADR_TP_ID=\\'48\\'}, 
+      DSSchema=\\'record
+         (
+           ADR_ID\\:int32\\;
+           ADR_TP_ID\\:int16\\;
+         )\\'
+}'
+   
+
+## General options
+[ident('ADR'); jobmon_ident('ADR')]
+## Inputs
+0< [] 'to_tables:to_adr.v'
+;
+
+#################################################################
+#### STAGE: IP_X_LO
+## Operator
+pxbridge
+## Operator options
+-XMLProperties '<?xml version=\\'1.0\\' encoding=\\'UTF-16\\'?><Properties version=\\'1.1\\'><Common><Context type=\\'int\\'>2</Context><Variant type=\\'string\\'>3.5</Variant><DescriptorVersion type=\\'string\\'>1.0</DescriptorVersion><PartitionType type=\\'int\\'>-1</PartitionType></Common><Connection><DataSource modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_DSN"]]]></DataSource><Username modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_LOGIN"]]]></Username><Password modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_PASSWORD"]]]></Password></Connection><Usage><WriteMode type=\\'int\\'><![CDATA[0]]></WriteMode><GenerateSQL modified=\\'1\\' type=\\'bool\\'><![CDATA[1]]></GenerateSQL><TableName modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_SCHEME"].ip_x_lo]]></TableName><EnableQuotedIDs type=\\'bool\\'><![CDATA[0]]></EnableQuotedIDs><SQL></SQL><TableAction collapsed=\\'1\\' type=\\'int\\'><![CDATA[0]]></TableAction><Transaction><RecordCount type=\\'int\\'><![CDATA[2000]]></RecordCount></Transaction><Session><IsolationLevel type=\\'int\\'><![CDATA[1]]></IsolationLevel><AutocommitMode type=\\'int\\'><![CDATA[0]]></AutocommitMode><ArraySize type=\\'int\\'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type=\\'bool\\'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type=\\'bool\\'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><CodePage collapsed=\\'1\\' type=\\'int\\'><![CDATA[0]]></CodePage></Session><BeforeAfter collapsed=\\'1\\' type=\\'bool\\'><![CDATA[0]]></BeforeAfter></Usage></Properties >'
+-connector '{
+   variant=3.5, 
+   library=ccodbc, 
+   version=1.0, 
+   variantlist='3.5', 
+   versionlist='1.0', 
+   name=ODBCConnector
+}'
+-target 0 '{
+      DSDescription={IP_ID=\\'\\<none\\>
+Searchable\\? N \\', LO_ID=\\'\\<none\\>
+Searchable\\? N \\', EFF_DT=\\'\\<none\\>
+Searchable\\? N \\', PPN_DT=\\'\\<none\\>
+Searchable\\? N \\', PPN_TM=\\'\\<none\\>
+Searchable\\? N \\', SRC_STM_ID=\\'\\<none\\>
+Searchable\\? N \\', END_DT=\\'\\<none\\>
+Searchable\\? N \\', IP_X_LO_TP_ID=\\'\\<none\\>
+Searchable\\? N \\'}, 
+      DSIsKey={IP_ID=1, LO_ID=1, EFF_DT=1, IP_X_LO_TP_ID=1}, 
+      DSDisplayWidth={IP_ID=11, LO_ID=11, EFF_DT=10, PPN_DT=10, PPN_TM=8, SRC_STM_ID=6, END_DT=10, IP_X_LO_TP_ID=6}, 
+      DSSQLType={IP_ID=4, LO_ID=4, EFF_DT=9, PPN_DT=9, PPN_TM=10, SRC_STM_ID=5, END_DT=9, IP_X_LO_TP_ID=5}, 
+      DSDerivation={IP_ID=\\'address_insert\\.IP_ID\\', LO_ID=\\'address_insert\\.LO_ID\\', EFF_DT=\\'address_insert\\.EFF_DT\\', PPN_DT=\\'CurrentDate()\\', PPN_TM=\\'CurrentTime()\\', SRC_STM_ID=\\'33\\', END_DT=\\'StringToDate( \\\\\\'9999\\-12\\-31\\\\\\')\\', IP_X_LO_TP_ID=\\'address_insert\\.IP_X_LO_TP_ID\\'}, 
+      DSSQLPrecision={IP_ID=10, LO_ID=10, EFF_DT=10, PPN_DT=10, PPN_TM=8, SRC_STM_ID=5, END_DT=10, IP_X_LO_TP_ID=5}, 
+      DSSchema=\\'record
+         (
+           IP_ID\\:int32\\;
+           LO_ID\\:int32\\;
+           EFF_DT\\:date\\;
+           PPN_DT\\:nullable date\\;
+           PPN_TM\\:nullable time\\;
+           SRC_STM_ID\\:nullable int16\\;
+           END_DT\\:nullable date\\;
+           IP_X_LO_TP_ID\\:int16\\;
+         )\\'
+}'
+   
+
+## General options
+[ident('IP_X_LO'); jobmon_ident('IP_X_LO')]
+## Inputs
+0< [] 'to_tables:to_ip_x_lo.v'
+;
+
+#################################################################
+#### STAGE: get_loid
+## Operator
+innerjoin
+## Operator options
+-key 'UNQ_ID_SRC_STM'
+-key 'DSC'
+
+## General options
+[ident('get_loid'); jobmon_ident('get_loid')]
+## Inputs
+0< [] 'address_insert:address.v'
+1< [] 'address_loid:lo_id.v'
+## Outputs
+0> [modify (
+keep
+  ID,COUNTRY,POSTIND,REGION,
+  RTYPE,NAMR,TTYPE,TNAME,
+  VILTYPE,VILNAM,STRTYPE,STRNAM,
+  HOUSE,CORP,FLAT,TP,
+  IP_ID,IP_X_LO_TP_ID,UNQ_ID_SRC_STM,DSC,
+  EFF_DT,LO_ID;
+)] 'get_loid:address_insert.v'
+;
+
+#################################################################
+#### STAGE: address_insert
+## Operator
+copy
+## General options
+[ident('address_insert')]
+## Inputs
+0< [ds] '[&"PS_CONNECTIONS.CDB_FILE_PATH"]guarant_address_load.ds'
+## Outputs
+0> [modify (
+  ID:not_nullable int32=ID;
+  COUNTRY:nullable string[max=2]=COUNTRY;
+  POSTIND:nullable string[max=6]=POSTIND;
+  REGION:nullable string[max=3]=REGION;
+  RTYPE:nullable string[max=10]=RTYPE;
+  NAMR:nullable string[max=100]=NAMR;
+  TTYPE:nullable string[max=10]=TTYPE;
+  TNAME:nullable string[max=100]=TNAME;
+  VILTYPE:nullable string[max=10]=VILTYPE;
+  VILNAM:nullable string[max=100]=VILNAM;
+  STRTYPE:nullable string[max=10]=STRTYPE;
+  STRNAM:nullable string[max=100]=STRNAM;
+  HOUSE:nullable string[max=15]=HOUSE;
+  CORP:nullable string[max=15]=CORP;
+  FLAT:nullable string[max=12]=FLAT;
+  TP:not_nullable int32=TP;
+  IP_ID:not_nullable int32=IP_ID;
+  IP_X_LO_TP_ID:not_nullable int16=IP_X_LO_TP_ID;
+  UNQ_ID_SRC_STM:not_nullable string[20]=UNQ_ID_SRC_STM;
+  DSC:not_nullable string[max=256]=DSC;
+  EFF_DT:nullable date=EFF_DT;
+keep
+  ID,COUNTRY,POSTIND,REGION,
+  RTYPE,NAMR,TTYPE,TNAME,
+  VILTYPE,VILNAM,STRTYPE,STRNAM,
+  HOUSE,CORP,FLAT,TP,
+  IP_ID,IP_X_LO_TP_ID,UNQ_ID_SRC_STM,DSC,
+  EFF_DT;
+)] 'address_insert:address.v'
+;
+
+#################################################################
+#### STAGE: address_loid
+## Operator
+import
+## Operator options
+-schema record
+  {final_delim=end, delim='|', quote=double}
+(
+  LO_ID:int32;
+  UNQ_ID_SRC_STM:string[20];
+  DSC:string[max=256];
+)
+-file  '[&"PS_CONNECTIONS.CDB_FILE_PATH"]guarant_address_lo.txt'
+-rejects continue
+-reportProgress yes
+
+## General options
+[ident('address_loid'); jobmon_ident('address_loid')]
+## Outputs
+0> [] 'address_loid:lo_id.v'
+;
+
+#################################################################
+#### STAGE: NEW_ADRESS_FOR_KLADR
+## Operator
+pxbridge
+## Operator options
+-XMLProperties '<?xml version=\\'1.0\\' encoding=\\'UTF-16\\'?><Properties version=\\'1.1\\'><Common><Context type=\\'int\\'>2</Context><Variant type=\\'string\\'>3.5</Variant><DescriptorVersion type=\\'string\\'>1.0</DescriptorVersion><PartitionType type=\\'int\\'>-1</PartitionType></Common><Connection><DataSource modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_DSN"]]]></DataSource><Username modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_LOGIN"]]]></Username><Password modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PS_CONNECTIONS.DWH_BDW_PASSWORD"]]]></Password></Connection><Usage><WriteMode type=\\'int\\'><![CDATA[0]]></WriteMode><GenerateSQL modified=\\'1\\' type=\\'bool\\'><![CDATA[1]]></GenerateSQL><TableName modified=\\'1\\' type=\\'string\\'><![CDATA[htf13tmp.new_adress_for_kladr]]></TableName><EnableQuotedIDs type=\\'bool\\'><![CDATA[0]]></EnableQuotedIDs><SQL></SQL><TableAction collapsed=\\'1\\' type=\\'int\\'><![CDATA[0]]></TableAction><Transaction><RecordCount type=\\'int\\'><![CDATA[2000]]></RecordCount></Transaction><Session><IsolationLevel type=\\'int\\'><![CDATA[1]]></IsolationLevel><AutocommitMode type=\\'int\\'><![CDATA[0]]></AutocommitMode><ArraySize type=\\'int\\'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type=\\'bool\\'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type=\\'bool\\'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><CodePage collapsed=\\'1\\' type=\\'int\\'><![CDATA[0]]></CodePage></Session><BeforeAfter collapsed=\\'1\\' type=\\'bool\\'><![CDATA[0]]></BeforeAfter></Usage></Properties >'
+-connector '{
+   variant=3.5, 
+   library=ccodbc, 
+   version=1.0, 
+   variantlist='3.5', 
+   versionlist='1.0', 
+   name=ODBCConnector
+}'
+-target 0 '{
+      DSDescription={LO_ID=\\'\\<none\\>
+Searchable\\? N \\', UNQ_ID_SRC_STM=\\'\\<none\\>
+Searchable\\? N \\', ADTYPE=\\'\\<none\\>
+Searchable\\? N \\', ADFMT=\\'\\<none\\>
+Searchable\\? N \\', DSC_ADDRESS=\\'\\<none\\>
+Searchable\\? N \\', CODE_REGION=\\'\\<none\\>
+Searchable\\? N \\', NAME_REGION=\\'\\<none\\>
+Searchable\\? N \\', SOCR_REGION=\\'\\<none\\>
+Searchable\\? N \\', CODE_RAION=\\'\\<none\\>
+Searchable\\? N \\', NAME_RAION=\\'\\<none\\>
+Searchable\\? N \\', SOCR_RAION=\\'\\<none\\>
+Searchable\\? N \\', CODE_CITY=\\'\\<none\\>
+Searchable\\? N \\', NAME_CITY=\\'\\<none\\>
+Searchable\\? N \\', SOCR_CITY=\\'\\<none\\>
+Searchable\\? N \\', CODE_TOWN=\\'\\<none\\>
+Searchable\\? N \\', NAME_TOWN=\\'\\<none\\>
+Searchable\\? N \\', SOCR_TOWN=\\'\\<none\\>
+Searchable\\? N \\', CODE_STREET=\\'\\<none\\>
+Searchable\\? N \\', NAME_STREET=\\'\\<none\\>
+Searchable\\? N \\', SOCR_STREET=\\'\\<none\\>
+Searchable\\? N \\', CODE_DOM=\\'\\<none\\>
+Searchable\\? N \\', DOM=\\'\\<none\\>
+Searchable\\? N \\', KORP=\\'\\<none\\>
+Searchable\\? N \\', KVART=\\'\\<none\\>
+Searchable\\? N \\', INDEX=\\'\\<none\\>
+Searchable\\? N \\'}, 
+      DSIsKey={LO_ID=1}, 
+      DSDisplayWidth={LO_ID=11, UNQ_ID_SRC_STM=20, ADTYPE=1, ADFMT=1, DSC_ADDRESS=256, CODE_REGION=13, NAME_REGION=40, SOCR_REGION=10, CODE_RAION=13, NAME_RAION=40, SOCR_RAION=10, CODE_CITY=13, NAME_CITY=40, SOCR_CITY=10, CODE_TOWN=13, NAME_TOWN=40, SOCR_TOWN=10, CODE_STREET=17, NAME_STREET=40, SOCR_STREET=10, CODE_DOM=19, DOM=20, KORP=10, KVART=10, INDEX=6}, 
+      DSSQLType={LO_ID=4, UNQ_ID_SRC_STM=1, ADTYPE=1, ADFMT=1, DSC_ADDRESS=12, CODE_REGION=1, NAME_REGION=1, SOCR_REGION=1, CODE_RAION=1, NAME_RAION=1, SOCR_RAION=1, CODE_CITY=1, NAME_CITY=1, SOCR_CITY=1, CODE_TOWN=1, NAME_TOWN=1, SOCR_TOWN=1, CODE_STREET=1, NAME_STREET=1, SOCR_STREET=1, CODE_DOM=1, DOM=1, KORP=1, KVART=1, INDEX=1}, 
+      DSDerivation={LO_ID=\\'address_insert\\.LO_ID\\', UNQ_ID_SRC_STM=\\'address_insert\\.UNQ_ID_SRC_STM\\', ADTYPE=\\'If address_insert\\.IP_X_LO_TP_ID\\=309 Or address_insert\\.IP_X_LO_TP_ID\\=1650 Then \\"F\\" Else \\"\\" \\', ADFMT=\\'\\"\\"\\', DSC_ADDRESS=\\'address_insert\\.DSC\\', CODE_REGION=\\'\\"\\"\\', NAME_REGION=\\'address_insert\\.REGION\\', SOCR_REGION=\\'address_insert\\.RTYPE\\', CODE_RAION=\\'\\"\\"\\', NAME_RAION=\\'address_insert\\.NAMR\\', SOCR_RAION=\\'address_insert\\.RTYPE\\', CODE_CITY=\\'\\"\\"\\', NAME_CITY=\\'address_insert\\.TNAME\\', SOCR_CITY=\\'address_insert\\.TTYPE\\', CODE_TOWN=\\'\\"\\"\\', NAME_TOWN=\\'address_insert\\.VILNAM\\', SOCR_TOWN=\\'address_insert\\.VILTYPE\\', CODE_STREET=\\'\\"\\"\\', NAME_STREET=\\'address_insert\\.STRNAM\\', SOCR_STREET=\\'address_insert\\.STRTYPE\\', CODE_DOM=\\'\\"\\"\\', DOM=\\'address_insert\\.HOUSE\\', KORP=\\'address_insert\\.CORP\\', KVART=\\'address_insert\\.FLAT\\', INDEX=\\'address_insert\\.POSTIND\\'}, 
+      DSSQLPrecision={LO_ID=10, UNQ_ID_SRC_STM=20, ADTYPE=1, ADFMT=1, DSC_ADDRESS=256, CODE_REGION=13, NAME_REGION=40, SOCR_REGION=10, CODE_RAION=13, NAME_RAION=40, SOCR_RAION=10, CODE_CITY=13, NAME_CITY=40, SOCR_CITY=10, CODE_TOWN=13, NAME_TOWN=40, SOCR_TOWN=10, CODE_STREET=17, NAME_STREET=40, SOCR_STREET=10, CODE_DOM=19, DOM=20, KORP=10, KVART=10, INDEX=6}, 
+      DSSchema=\\'record
+         (
+           LO_ID\\:int32\\;
+           UNQ_ID_SRC_STM\\:string\\[20\\]\\;
+           ADTYPE\\:string\\[1\\]\\;
+           ADFMT\\:nullable string\\[1\\]\\;
+           DSC_ADDRESS\\:nullable string\\[max\\=256\\]\\;
+           CODE_REGION\\:nullable string\\[13\\]\\;
+           NAME_REGION\\:nullable string\\[40\\]\\;
+           SOCR_REGION\\:nullable string\\[10\\]\\;
+           CODE_RAION\\:nullable string\\[13\\]\\;
+           NAME_RAION\\:nullable string\\[40\\]\\;
+           SOCR_RAION\\:nullable string\\[10\\]\\;
+           CODE_CITY\\:nullable string\\[13\\]\\;
+           NAME_CITY\\:nullable string\\[40\\]\\;
+           SOCR_CITY\\:nullable string\\[10\\]\\;
+           CODE_TOWN\\:nullable string\\[13\\]\\;
+           NAME_TOWN\\:nullable string\\[40\\]\\;
+           SOCR_TOWN\\:nullable string\\[10\\]\\;
+           CODE_STREET\\:nullable string\\[17\\]\\;
+           NAME_STREET\\:nullable string\\[40\\]\\;
+           SOCR_STREET\\:nullable string\\[10\\]\\;
+           CODE_DOM\\:nullable string\\[19\\]\\;
+           DOM\\:nullable string\\[20\\]\\;
+           KORP\\:nullable string\\[10\\]\\;
+           KVART\\:nullable string\\[10\\]\\;
+           INDEX\\:nullable string\\[6\\]\\;
+         )\\'
+}'
+   
+
+## General options
+[ident('NEW_ADRESS_FOR_KLADR'); jobmon_ident('NEW_ADRESS_FOR_KLADR')]
+## Inputs
+0< [] 'to_tables:to_pst_adr.v'
+;
+
+
+=+=+=+=
+      IsTemplate "0"
+      NLSLocale ",,,,"
+      JobType "3"
+      Category "\\Jobs\\GUARANTOR_ADDRESS"
+      CenturyBreakYear "30"
+      NextAliasID "2"
+      ParameterFileDDName "DD00001"
+      ReservedWordCheck "1"
+      TransactionSize "0"
+      ValidationStatus "0"
+      Uploadable "0"
+      PgmCustomizationFlag "0"
+      JobReportFlag "0"
+      AllowMultipleInvocations "1"
+      Act2ActOverideDefaults "0"
+      Act2ActEnableRowBuffer "0"
+      Act2ActUseIPC "0"
+      Act2ActBufferSize "0"
+      Act2ActIPCTimeout "0"
+      ExpressionSemanticCheckFlag "0"
+      TraceOption "0"
+      EnableCacheSharing "0"
+      RuntimeColumnPropagation "0"
+      RelStagesInJobStatus "-1"
+      WebServiceEnabled "0"
+      MFProcessMetaData "0"
+      MFProcessMetaDataXMLFileExchangeMethod "0"
+      IMSProgType "0"
+      CopyLibPrefix "ARDT"
+      RecordPerformanceResults "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0"
+      OLEType "CContainerView"
+      Readonly "0"
+      Name "Job"
+      NextID "1"
+      IsTopLevel "0"
+      StageList "V0S3|V0S12|V0S13|V5S0|V6S0|V6S2|V6S3|V0S29"
+      StageXPos "360|576|576|360|120|120|120|552"
+      StageYPos "240|120|240|480|240|384|120|408"
+      StageTypes "CTransformerStage|CCustomStage.CC_GUI|CCustomStage.CC_GUI|CCustomStage.CC_GUI|CCustomStage|CCustomStage|CCustomStage|CCustomStage.CC_GUI"
+      NextStageID "30"
+      SnapToGrid "1"
+      GridLines "0"
+      ZoomValue "100"
+      StageXSize "48|48|48|48|48|48|48|48"
+      StageYSize "48|48|48|48|48|48|48|48"
+      ContainerViewSizing "0107 0084 0817 0672 0000 0001 0000 0037"
+      StageNames "to_tables|LO|ADR|IP_X_LO|get_loid|address_insert|address_loid|NEW_ADRESS_FOR_KLADR"
+      StageTypeIDs "CTransformerStage|ODBCConnectorPX|ODBCConnectorPX|ODBCConnectorPX|PxJoin|PxDataSet|PxSequentialFile|ODBCConnectorPX"
+      LinkNames "to_lo,to_adr,to_pst_adr,to_ip_x_lo| | | |address_insert|address|lo_id| "
+      LinkHasMetaDatas "True,True,True,True| | | |True|True|True| "
+      LinkTypes "1,1,1,1| | | |1|1|1| "
+      LinkNamePositionXs "426,466,432,384| | | |238|149|144| "
+      LinkNamePositionYs "237,264,326,357| | | |267|351|211| "
+      TargetStageIDs "V0S12,V0S13,V0S29,V5S0| | | |V0S3|V6S0|V6S0| "
+      SourceStageEffectiveExecutionModes "2,2,2,2| | | |2|2|1| "
+      SourceStageRuntimeExecutionModes "2,2,2,2| | | |2|2|1| "
+      TargetStageEffectiveExecutionModes "2,2,2,2| | | |2|2|2| "
+      TargetStageRuntimeExecutionModes "2,2,2,2| | | |2|2|2| "
+      LinkIsSingleOperatorLookup "False,False,False,False| | | |False|False|False| "
+      LinkIsSortSequential "False,False,False,False| | | |False|False|False| "
+      LinkSortMode "0,0,0,0| | | |0|0|0| "
+      LinkPartColMode "1,1,1,1| | | |1|1|1| "
+      LinkSourcePinIDs "V0S3P2,V0S3P3,V0S3P4,V0S3P6| | | |V6S0P3|V6S2P1|V6S3P1| "
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S12"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "LO"
+      NextID "2"
+      InputPins "V0S12P1"
+      StageType "ODBCConnectorPX"
+      AllowColumnMapping "0"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariants"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsLibraries"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsVersions"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectThreshold"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectNumber"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectUsesPercentage"
+         Value "false"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "ODBCConnector"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Engine"
+         Value "EE"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Context"
+         Value "target"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectionString"
+         Value "/Connection/DataSource"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Username"
+         Value "/Connection/Username"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Password"
+         Value "/Connection/Password"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "XMLProperties"
+         Value "<?xml version='1.0' encoding='UTF-16'?><Properties version='1.1'><Common><Context type='int'>2</Context><Variant type='string'>3.5</Variant><DescriptorVersion type='string'>1.0</DescriptorVersion><PartitionType type='int'>-1</PartitionType></Common><Connection><DataSource modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_DSN#]]></DataSource><Username modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_LOGIN#]]></Username><Password modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_PASSWORD#]]></Password></Connection><Usage><WriteMode type='int'><![CDATA[0]]></WriteMode><GenerateSQL modified='1' type='bool'><![CDATA[1]]></GenerateSQL><TableName modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_SCHEME#.lo]]></TableName><EnableQuotedIDs type='bool'><![CDATA[0]]></EnableQuotedIDs><SQL></SQL><TableAction collapsed='1' type='int'><![CDATA[0]]></TableAction><Transaction><RecordCount type='int'><![CDATA[2000]]></RecordCount></Transaction><Session><IsolationLevel type='int'><![CDATA[1]]></IsolationLevel><AutocommitMode type='int'><![CDATA[0]]></AutocommitMode><ArraySize type='int'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type='bool'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type='bool'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type='bool'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type='bool'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><CodePage collapsed='1' type='int'><![CDATA[0]]></CodePage></Session><BeforeAfter collapsed='1' type='bool'><![CDATA[0]]></BeforeAfter></Usage></Properties >"
+      END DSSUBRECORD
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S12P1"
+      OLEType "CCustomInput"
+      Readonly "0"
+      Name "to_lo"
+      Partner "V0S3|V0S3P2"
+      LinkType "1"
+      ConditionNotMet "fail"
+      LookupFail "fail"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "ODBCConnector"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      TransactionSize "0"
+      TXNBehaviour "0"
+      EnableTxGroup "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S13"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "ADR"
+      NextID "2"
+      InputPins "V0S13P1"
+      StageType "ODBCConnectorPX"
+      AllowColumnMapping "0"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariants"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsLibraries"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsVersions"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectThreshold"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectNumber"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectUsesPercentage"
+         Value "false"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "ODBCConnector"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Engine"
+         Value "EE"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Context"
+         Value "target"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectionString"
+         Value "/Connection/DataSource"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Username"
+         Value "/Connection/Username"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Password"
+         Value "/Connection/Password"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "XMLProperties"
+         Value "<?xml version='1.0' encoding='UTF-16'?><Properties version='1.1'><Common><Context type='int'>2</Context><Variant type='string'>3.5</Variant><DescriptorVersion type='string'>1.0</DescriptorVersion><PartitionType type='int'>-1</PartitionType></Common><Connection><DataSource modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_DSN#]]></DataSource><Username modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_LOGIN#]]></Username><Password modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_PASSWORD#]]></Password></Connection><Usage><WriteMode type='int'><![CDATA[0]]></WriteMode><GenerateSQL modified='1' type='bool'><![CDATA[1]]></GenerateSQL><TableName modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_SCHEME#.adr]]></TableName><EnableQuotedIDs type='bool'><![CDATA[0]]></EnableQuotedIDs><SQL></SQL><TableAction collapsed='1' type='int'><![CDATA[0]]></TableAction><Transaction><RecordCount type='int'><![CDATA[2000]]></RecordCount></Transaction><Session><IsolationLevel type='int'><![CDATA[1]]></IsolationLevel><AutocommitMode type='int'><![CDATA[0]]></AutocommitMode><ArraySize type='int'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type='bool'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type='bool'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type='bool'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type='bool'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><CodePage collapsed='1' type='int'><![CDATA[0]]></CodePage></Session><BeforeAfter collapsed='1' type='bool'><![CDATA[0]]></BeforeAfter></Usage></Properties >"
+      END DSSUBRECORD
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S13P1"
+      OLEType "CCustomInput"
+      Readonly "0"
+      Name "to_adr"
+      Partner "V0S3|V0S3P3"
+      LinkType "1"
+      ConditionNotMet "fail"
+      LookupFail "fail"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "ODBCConnector"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      TransactionSize "0"
+      TXNBehaviour "0"
+      EnableTxGroup "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S29"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "NEW_ADRESS_FOR_KLADR"
+      NextID "2"
+      InputPins "V0S29P1"
+      StageType "ODBCConnectorPX"
+      AllowColumnMapping "0"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariants"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsLibraries"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsVersions"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectThreshold"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectNumber"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectUsesPercentage"
+         Value "false"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "ODBCConnector"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Engine"
+         Value "EE"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Context"
+         Value "target"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectionString"
+         Value "/Connection/DataSource"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Username"
+         Value "/Connection/Username"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Password"
+         Value "/Connection/Password"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "XMLProperties"
+         Value "<?xml version='1.0' encoding='UTF-16'?><Properties version='1.1'><Common><Context type='int'>2</Context><Variant type='string'>3.5</Variant><DescriptorVersion type='string'>1.0</DescriptorVersion><PartitionType type='int'>-1</PartitionType></Common><Connection><DataSource modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_DSN#]]></DataSource><Username modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_LOGIN#]]></Username><Password modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_PASSWORD#]]></Password></Connection><Usage><WriteMode type='int'><![CDATA[0]]></WriteMode><GenerateSQL modified='1' type='bool'><![CDATA[1]]></GenerateSQL><TableName modified='1' type='string'><![CDATA[htf13tmp.new_adress_for_kladr]]></TableName><EnableQuotedIDs type='bool'><![CDATA[0]]></EnableQuotedIDs><SQL></SQL><TableAction collapsed='1' type='int'><![CDATA[0]]></TableAction><Transaction><RecordCount type='int'><![CDATA[2000]]></RecordCount></Transaction><Session><IsolationLevel type='int'><![CDATA[1]]></IsolationLevel><AutocommitMode type='int'><![CDATA[0]]></AutocommitMode><ArraySize type='int'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type='bool'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type='bool'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type='bool'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type='bool'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><CodePage collapsed='1' type='int'><![CDATA[0]]></CodePage></Session><BeforeAfter collapsed='1' type='bool'><![CDATA[0]]></BeforeAfter></Usage></Properties >"
+      END DSSUBRECORD
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S29P1"
+      OLEType "CCustomInput"
+      Readonly "0"
+      Name "to_pst_adr"
+      Partner "V0S3|V0S3P4"
+      LinkType "1"
+      ConditionNotMet "fail"
+      LookupFail "fail"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "ODBCConnector"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      TransactionSize "0"
+      TXNBehaviour "0"
+      EnableTxGroup "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3"
+      OLEType "CTransformerStage"
+      Readonly "0"
+      Name "to_tables"
+      NextID "8"
+      InputPins "V0S3P7"
+      OutputPins "V0S3P2|V0S3P3|V0S3P4|V0S3P6"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxGenCode"
+         Value =+=+=+=
+//
+// Generated file to implement the V0S3_gr_address_insert_to_tables transform operator.
+//
+
+// define our input/output link names
+inputname 0 address_insert;
+outputname 0 to_lo;
+outputname 1 to_adr;
+outputname 2 to_pst_adr;
+outputname 3 to_ip_x_lo;
+
+initialize {
+	// define our row rejected variable
+	int8 RowRejected0;
+
+	// define our null set variable
+	int8 NullSetVar0;
+
+	// declare our intermediate variables for this section
+	int16 InterVar0_0;
+	string InterVar0_2;
+	int16 InterVar0_6;
+	int16 InterVar0_7;
+	int16 InterVar0_8;
+	int16 InterVar0_9;
+	string InterVar0_10;
+	ustring InterVar0_11;
+
+	// initialise constant values which require conversion
+	InterVar0_0 = 33;
+	InterVar0_2 = "";
+	InterVar0_6 = 32;
+	InterVar0_7 = 48;
+	InterVar0_8 = 309;
+	InterVar0_9 = 1650;
+	InterVar0_10 = "F";
+	InterVar0_11 = "9999-12-31";
+}
+
+mainloop {
+	// initialise our row rejected variable
+	RowRejected0 = 1;
+
+	// declare our intermediate variables for this section
+	string InterVar0_1;
+	string InterVar0_3;
+	string InterVar0_4;
+	string InterVar0_5;
+
+	// evaluate columns (no constraints) for link: to_lo
+	to_lo.PPN_DT = current_date();
+	to_lo.PPN_TM = current_time();
+	to_lo.SRC_STM_ID = InterVar0_0;
+	to_lo.UNQ_ID_SRC_STM = trimc_string(address_insert.UNQ_ID_SRC_STM);
+	to_lo.PRN_LO_ID = set_null();
+	if (notnull(address_insert.STRNAM)) {
+		InterVar0_1 = address_insert.STRNAM;
+	} else {
+		InterVar0_1 = InterVar0_2;
+	}
+	if (notnull(address_insert.HOUSE)) {
+		InterVar0_3 = address_insert.HOUSE;
+	} else {
+		InterVar0_3 = InterVar0_2;
+	}
+	if (notnull(address_insert.CORP)) {
+		InterVar0_4 = address_insert.CORP;
+	} else {
+		InterVar0_4 = InterVar0_2;
+	}
+	if (notnull(address_insert.FLAT)) {
+		InterVar0_5 = address_insert.FLAT;
+	} else {
+		InterVar0_5 = InterVar0_2;
+	}
+	to_lo.LO_NM = (((trim_leading_trailing(InterVar0_1) + trim_leading_trailing(InterVar0_3)) + trim_leading_trailing(InterVar0_4)) + trim_leading_trailing(InterVar0_5));
+	to_lo.LO_TP_ID = InterVar0_6;
+	writerecord 0;
+	RowRejected0 = 0;
+	// evaluate columns (no constraints) for link: to_adr
+	to_adr.ADR_ID = address_insert.LO_ID;
+	to_adr.ADR_TP_ID = InterVar0_7;
+	writerecord 1;
+	RowRejected0 = 0;
+	// evaluate columns (no constraints) for link: to_pst_adr
+	if (((address_insert.IP_X_LO_TP_ID == InterVar0_8) || (address_insert.IP_X_LO_TP_ID == InterVar0_9))) {
+		to_pst_adr.ADTYPE = InterVar0_10;
+	} else {
+		to_pst_adr.ADTYPE = InterVar0_2;
+	}
+	//;
+	to_pst_adr.ADFMT = InterVar0_2;
+	to_pst_adr.DSC_ADDRESS = address_insert.DSC;
+	to_pst_adr.CODE_REGION = InterVar0_2;
+	to_pst_adr.NAME_REGION = address_insert.REGION;
+	to_pst_adr.SOCR_REGION = address_insert.RTYPE;
+	to_pst_adr.CODE_RAION = InterVar0_2;
+	to_pst_adr.NAME_RAION = address_insert.NAMR;
+	to_pst_adr.SOCR_RAION = address_insert.RTYPE;
+	to_pst_adr.CODE_CITY = InterVar0_2;
+	to_pst_adr.NAME_CITY = address_insert.TNAME;
+	to_pst_adr.SOCR_CITY = address_insert.TTYPE;
+	to_pst_adr.CODE_TOWN = InterVar0_2;
+	to_pst_adr.NAME_TOWN = address_insert.VILNAM;
+	to_pst_adr.SOCR_TOWN = address_insert.VILTYPE;
+	to_pst_adr.CODE_STREET = InterVar0_2;
+	to_pst_adr.NAME_STREET = address_insert.STRNAM;
+	to_pst_adr.SOCR_STREET = address_insert.STRTYPE;
+	to_pst_adr.CODE_DOM = InterVar0_2;
+	to_pst_adr.DOM = address_insert.HOUSE;
+	to_pst_adr.KORP = address_insert.CORP;
+	to_pst_adr.KVART = address_insert.FLAT;
+	to_pst_adr.INDEX = address_insert.POSTIND;
+	writerecord 2;
+	RowRejected0 = 0;
+	// evaluate columns (no constraints) for link: to_ip_x_lo
+	to_ip_x_lo.EFF_DT = address_insert.EFF_DT;
+	to_ip_x_lo.PPN_DT = current_date();
+	to_ip_x_lo.PPN_TM = current_time();
+	to_ip_x_lo.SRC_STM_ID = InterVar0_0;
+	to_ip_x_lo.END_DT = date_from_ustring(InterVar0_11);
+	writerecord 3;
+	RowRejected0 = 0;
+}
+
+finish {
+}
+
+=+=+=+=
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxClassName"
+         Value "V0S3_gr_address_insert_to_tables"
+      END DSSUBRECORD
+      ValidationStatus "0"
+      StageType "CTransformerStage"
+      BlockSize "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3P2"
+      OLEType "CTrxOutput"
+      Readonly "0"
+      Name "to_lo"
+      Partner "V0S12|V0S12P1"
+      Reject "0"
+      ErrorPin "0"
+      RowLimit "0"
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "LO_ID"
+         Description "<none>"
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "11"
+         Derivation "address_insert.LO_ID"
+         Group "0"
+         ParsedDerivation "address_insert.LO_ID"
+         SourceColumn "address_insert.LO_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "LO_ID"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "PPN_DT"
+         Description "<none>"
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "CurrentDate()"
+         Group "0"
+         ParsedDerivation "CurrentDate()"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "PPN_DT"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "PPN_TM"
+         Description "<none>"
+         SqlType "10"
+         Precision "8"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "8"
+         Derivation "CurrentTime()"
+         Group "0"
+         ParsedDerivation "CurrentTime()"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "PPN_TM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SRC_STM_ID"
+         Description "<none>"
+         SqlType "5"
+         Precision "5"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "6"
+         Derivation "33"
+         Group "0"
+         ParsedDerivation "33"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "SRC_STM_ID"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "UNQ_ID_SRC_STM"
+         Description "<none>"
+         SqlType "1"
+         Precision "20"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "20"
+         Derivation "Trim(address_insert.UNQ_ID_SRC_STM)"
+         Group "0"
+         ParsedDerivation "Trim(address_insert.UNQ_ID_SRC_STM)"
+         SourceColumn "address_insert.UNQ_ID_SRC_STM"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "UNQ_ID_SRC_STM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "PRN_LO_ID"
+         Description "<none>"
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "11"
+         Derivation "SetNull()"
+         Group "0"
+         ParsedDerivation "SetNull()"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "PRN_LO_ID"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "LO_NM"
+         Description "<none>"
+         SqlType "1"
+         Precision "32"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "32"
+         Derivation "TrimLeadingTrailing (NullToEmpty(address_insert.STRNAM)) :TrimLeadingTrailing (NullToEmpty(address_insert.HOUSE)) :TrimLeadingTrailing (NullToEmpty(address_insert.CORP)) :TrimLeadingTrailing (NullToEmpty(address_insert.FLAT))"
+         Group "0"
+         ParsedDerivation "TrimLeadingTrailing(( IF IsNotNull((address_insert.STRNAM)) THEN (address_insert.STRNAM) ELSE \"\")) : TrimLeadingTrailing(( IF IsNotNull((address_insert.HOUSE)) THEN (address_insert.HOUSE) ELSE \"\")) : TrimLeadingTrailing(( IF IsNotNull((address_insert.CORP)) THEN (address_insert.CORP) ELSE \"\")) : TrimLeadingTrailing(( IF IsNotNull((address_insert.FLAT)) THEN (address_insert.FLAT) ELSE \"\"))"
+         SourceColumn "address_insert.STRNAM;address_insert.HOUSE;address_insert.CORP;address_insert.FLAT"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "LO_NM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "DSC"
+         Description "<none>"
+         SqlType "12"
+         Precision "256"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "256"
+         Derivation "address_insert.DSC"
+         Group "0"
+         ParsedDerivation "address_insert.DSC"
+         SourceColumn "address_insert.DSC"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "DSC"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "LO_TP_ID"
+         Description "<none>"
+         SqlType "5"
+         Precision "5"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "6"
+         Derivation "32"
+         Group "0"
+         ParsedDerivation "32"
+         SortKey "0"
+         SortType "0"
+         TableDef "PlugIn\\DSDB2\\HTF13.LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "LO_TP_ID"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  LO_ID:int32;
+  PPN_DT:date;
+  PPN_TM:time;
+  SRC_STM_ID:int16;
+  UNQ_ID_SRC_STM:string[20];
+  PRN_LO_ID:nullable int32;
+  LO_NM:string[32];
+  DSC:string[max=256];
+  LO_TP_ID:int16;
+)
+=+=+=+=
+      END DSSUBRECORD
+      LeftTextPos "426"
+      TopTextPos "237"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3P3"
+      OLEType "CTrxOutput"
+      Readonly "0"
+      Name "to_adr"
+      Partner "V0S13|V0S13P1"
+      Reject "0"
+      ErrorPin "0"
+      RowLimit "0"
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "ADR_ID"
+         SqlType "4"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "address_insert.LO_ID"
+         Group "0"
+         ParsedDerivation "address_insert.LO_ID"
+         SourceColumn "address_insert.LO_ID"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ADR_TP_ID"
+         SqlType "5"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "48"
+         Group "0"
+         ParsedDerivation "48"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  ADR_ID:int32;
+  ADR_TP_ID:int16;
+)
+=+=+=+=
+      END DSSUBRECORD
+      LeftTextPos "466"
+      TopTextPos "264"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3P4"
+      OLEType "CTrxOutput"
+      Readonly "0"
+      Name "to_pst_adr"
+      Partner "V0S29|V0S29P1"
+      Reject "0"
+      ErrorPin "0"
+      RowLimit "0"
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "LO_ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "11"
+         Derivation "address_insert.LO_ID"
+         Group "0"
+         ParsedDerivation "address_insert.LO_ID"
+         SourceColumn "address_insert.LO_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "LO_ID"
+         APTFieldProp "quote=none"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "UNQ_ID_SRC_STM"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "20"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "20"
+         Derivation "address_insert.UNQ_ID_SRC_STM"
+         Group "0"
+         ParsedDerivation "address_insert.UNQ_ID_SRC_STM"
+         SourceColumn "address_insert.UNQ_ID_SRC_STM"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "UNQ_ID_SRC_STM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ADTYPE"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "1"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "1"
+         Derivation "If address_insert.IP_X_LO_TP_ID=309 Or address_insert.IP_X_LO_TP_ID=1650 Then \"F\" Else \"\" "
+         Group "0"
+         ParsedDerivation " If address_insert.IP_X_LO_TP_ID = 309 Or address_insert.IP_X_LO_TP_ID = 1650 Then \"F\" Else \"\""
+         SourceColumn "address_insert.IP_X_LO_TP_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "ADTYPE"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ADFMT"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "1"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "1"
+         Derivation "\"\""
+         Group "0"
+         ParsedDerivation "\"\""
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "ADFMT"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "DSC_ADDRESS"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "256"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "256"
+         Derivation "address_insert.DSC"
+         Group "0"
+         ParsedDerivation "address_insert.DSC"
+         SourceColumn "address_insert.DSC"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "DSC_ADDRESS"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "CODE_REGION"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "13"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "13"
+         Derivation "\"\""
+         Group "0"
+         ParsedDerivation "\"\""
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "CODE_REGION"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "NAME_REGION"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "40"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "40"
+         Derivation "address_insert.REGION"
+         Group "0"
+         ParsedDerivation "address_insert.REGION"
+         SourceColumn "address_insert.REGION"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "NAME_REGION"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SOCR_REGION"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address_insert.RTYPE"
+         Group "0"
+         ParsedDerivation "address_insert.RTYPE"
+         SourceColumn "address_insert.RTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "SOCR_REGION"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "CODE_RAION"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "13"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "13"
+         Derivation "\"\""
+         Group "0"
+         ParsedDerivation "\"\""
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "CODE_RAION"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "NAME_RAION"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "40"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "40"
+         Derivation "address_insert.NAMR"
+         Group "0"
+         ParsedDerivation "address_insert.NAMR"
+         SourceColumn "address_insert.NAMR"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "NAME_RAION"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SOCR_RAION"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address_insert.RTYPE"
+         Group "0"
+         ParsedDerivation "address_insert.RTYPE"
+         SourceColumn "address_insert.RTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "SOCR_RAION"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "CODE_CITY"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "13"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "13"
+         Derivation "\"\""
+         Group "0"
+         ParsedDerivation "\"\""
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "CODE_CITY"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "NAME_CITY"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "40"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "40"
+         Derivation "address_insert.TNAME"
+         Group "0"
+         ParsedDerivation "address_insert.TNAME"
+         SourceColumn "address_insert.TNAME"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "NAME_CITY"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SOCR_CITY"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address_insert.TTYPE"
+         Group "0"
+         ParsedDerivation "address_insert.TTYPE"
+         SourceColumn "address_insert.TTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "SOCR_CITY"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "CODE_TOWN"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "13"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "13"
+         Derivation "\"\""
+         Group "0"
+         ParsedDerivation "\"\""
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "CODE_TOWN"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "NAME_TOWN"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "40"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "40"
+         Derivation "address_insert.VILNAM"
+         Group "0"
+         ParsedDerivation "address_insert.VILNAM"
+         SourceColumn "address_insert.VILNAM"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "NAME_TOWN"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SOCR_TOWN"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address_insert.VILTYPE"
+         Group "0"
+         ParsedDerivation "address_insert.VILTYPE"
+         SourceColumn "address_insert.VILTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "SOCR_TOWN"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "CODE_STREET"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "17"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "17"
+         Derivation "\"\""
+         Group "0"
+         ParsedDerivation "\"\""
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "CODE_STREET"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "NAME_STREET"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "40"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "40"
+         Derivation "address_insert.STRNAM"
+         Group "0"
+         ParsedDerivation "address_insert.STRNAM"
+         SourceColumn "address_insert.STRNAM"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "NAME_STREET"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SOCR_STREET"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address_insert.STRTYPE"
+         Group "0"
+         ParsedDerivation "address_insert.STRTYPE"
+         SourceColumn "address_insert.STRTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "SOCR_STREET"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "CODE_DOM"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "19"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "19"
+         Derivation "\"\""
+         Group "0"
+         ParsedDerivation "\"\""
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "CODE_DOM"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "DOM"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "20"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "20"
+         Derivation "address_insert.HOUSE"
+         Group "0"
+         ParsedDerivation "address_insert.HOUSE"
+         SourceColumn "address_insert.HOUSE"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "DOM"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "KORP"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address_insert.CORP"
+         Group "0"
+         ParsedDerivation "address_insert.CORP"
+         SourceColumn "address_insert.CORP"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "KORP"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "KVART"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address_insert.FLAT"
+         Group "0"
+         ParsedDerivation "address_insert.FLAT"
+         SourceColumn "address_insert.FLAT"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "KVART"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "INDEX"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "1"
+         Precision "6"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "6"
+         Derivation "address_insert.POSTIND"
+         Group "0"
+         ParsedDerivation "address_insert.POSTIND"
+         SourceColumn "address_insert.POSTIND"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13TMP.NEW_ADRESS_FOR_KLADR"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "INDEX"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  LO_ID:int32;
+  UNQ_ID_SRC_STM:string[20];
+  ADTYPE:string[1];
+  ADFMT:nullable string[1];
+  DSC_ADDRESS:nullable string[max=256];
+  CODE_REGION:nullable string[13];
+  NAME_REGION:nullable string[40];
+  SOCR_REGION:nullable string[10];
+  CODE_RAION:nullable string[13];
+  NAME_RAION:nullable string[40];
+  SOCR_RAION:nullable string[10];
+  CODE_CITY:nullable string[13];
+  NAME_CITY:nullable string[40];
+  SOCR_CITY:nullable string[10];
+  CODE_TOWN:nullable string[13];
+  NAME_TOWN:nullable string[40];
+  SOCR_TOWN:nullable string[10];
+  CODE_STREET:nullable string[17];
+  NAME_STREET:nullable string[40];
+  SOCR_STREET:nullable string[10];
+  CODE_DOM:nullable string[19];
+  DOM:nullable string[20];
+  KORP:nullable string[10];
+  KVART:nullable string[10];
+  INDEX:nullable string[6];
+)
+=+=+=+=
+      END DSSUBRECORD
+      LeftTextPos "432"
+      TopTextPos "326"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3P6"
+      OLEType "CTrxOutput"
+      Readonly "0"
+      Name "to_ip_x_lo"
+      Partner "V5S0|V5S0P1"
+      Reject "0"
+      ErrorPin "0"
+      RowLimit "0"
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "IP_ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "11"
+         Derivation "address_insert.IP_ID"
+         Group "0"
+         ParsedDerivation "address_insert.IP_ID"
+         SourceColumn "address_insert.IP_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13.IP_X_LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "IP_ID"
+         APTFieldProp "quote=none"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "LO_ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "11"
+         Derivation "address_insert.LO_ID"
+         Group "0"
+         ParsedDerivation "address_insert.LO_ID"
+         SourceColumn "address_insert.LO_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13.IP_X_LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "LO_ID"
+         APTFieldProp "quote=none"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "EFF_DT"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "10"
+         Derivation "address_insert.EFF_DT"
+         Group "0"
+         ParsedDerivation "address_insert.EFF_DT"
+         SourceColumn "address_insert.EFF_DT"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13.IP_X_LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "EFF_DT"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "PPN_DT"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "CurrentDate()"
+         Group "0"
+         ParsedDerivation "CurrentDate()"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13.IP_X_LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "PPN_DT"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "PPN_TM"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "10"
+         Precision "8"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "8"
+         Derivation "CurrentTime()"
+         Group "0"
+         ParsedDerivation "CurrentTime()"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13.IP_X_LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "PPN_TM"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SRC_STM_ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "5"
+         Precision "5"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "6"
+         Derivation "33"
+         Group "0"
+         ParsedDerivation "33"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13.IP_X_LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "SRC_STM_ID"
+         APTFieldProp "quote=none, null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "END_DT"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "StringToDate( '9999-12-31')"
+         Group "0"
+         ParsedDerivation "StringToDate('9999-12-31')"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13.IP_X_LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "END_DT"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "IP_X_LO_TP_ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "5"
+         Precision "5"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "6"
+         Derivation "address_insert.IP_X_LO_TP_ID"
+         Group "0"
+         ParsedDerivation "address_insert.IP_X_LO_TP_ID"
+         SourceColumn "address_insert.IP_X_LO_TP_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "ODBC\\TEST5\\HTF13.IP_X_LO"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "IP_X_LO_TP_ID"
+         APTFieldProp "quote=none"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  IP_ID:int32;
+  LO_ID:int32;
+  EFF_DT:date;
+  PPN_DT:nullable date;
+  PPN_TM:nullable time;
+  SRC_STM_ID:nullable int16;
+  END_DT:nullable date;
+  IP_X_LO_TP_ID:int16;
+)
+=+=+=+=
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      LeftTextPos "384"
+      TopTextPos "357"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3P7"
+      OLEType "CTrxInput"
+      Readonly "0"
+      Name "address_insert"
+      Partner "V6S0|V6S0P3"
+      LinkType "1"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  ID:int32;
+  COUNTRY:nullable string[max=2];
+  POSTIND:nullable string[max=6];
+  REGION:nullable string[max=3];
+  RTYPE:nullable string[max=10];
+  NAMR:nullable string[max=100];
+  TTYPE:nullable string[max=10];
+  TNAME:nullable string[max=100];
+  VILTYPE:nullable string[max=10];
+  VILNAM:nullable string[max=100];
+  STRTYPE:nullable string[max=10];
+  STRNAM:nullable string[max=100];
+  HOUSE:nullable string[max=15];
+  CORP:nullable string[max=15];
+  FLAT:nullable string[max=12];
+  TP:int32;
+  IP_ID:int32;
+  IP_X_LO_TP_ID:int16;
+  UNQ_ID_SRC_STM:string[20];
+  DSC:string[max=256];
+  EFF_DT:nullable date;
+  LO_ID:int32;
+)
+=+=+=+=
+      END DSSUBRECORD
+      MultiRow "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V5S0"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "IP_X_LO"
+      NextID "2"
+      InputPins "V5S0P1"
+      StageType "ODBCConnectorPX"
+      AllowColumnMapping "0"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariants"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsLibraries"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsVersions"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectThreshold"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectNumber"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectUsesPercentage"
+         Value "false"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "ODBCConnector"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Engine"
+         Value "EE"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Context"
+         Value "target"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectionString"
+         Value "/Connection/DataSource"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Username"
+         Value "/Connection/Username"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Password"
+         Value "/Connection/Password"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "XMLProperties"
+         Value "<?xml version='1.0' encoding='UTF-16'?><Properties version='1.1'><Common><Context type='int'>2</Context><Variant type='string'>3.5</Variant><DescriptorVersion type='string'>1.0</DescriptorVersion><PartitionType type='int'>-1</PartitionType></Common><Connection><DataSource modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_DSN#]]></DataSource><Username modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_LOGIN#]]></Username><Password modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_PASSWORD#]]></Password></Connection><Usage><WriteMode type='int'><![CDATA[0]]></WriteMode><GenerateSQL modified='1' type='bool'><![CDATA[1]]></GenerateSQL><TableName modified='1' type='string'><![CDATA[#PS_CONNECTIONS.DWH_BDW_SCHEME#.ip_x_lo]]></TableName><EnableQuotedIDs type='bool'><![CDATA[0]]></EnableQuotedIDs><SQL></SQL><TableAction collapsed='1' type='int'><![CDATA[0]]></TableAction><Transaction><RecordCount type='int'><![CDATA[2000]]></RecordCount></Transaction><Session><IsolationLevel type='int'><![CDATA[1]]></IsolationLevel><AutocommitMode type='int'><![CDATA[0]]></AutocommitMode><ArraySize type='int'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type='bool'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type='bool'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type='bool'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type='bool'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><CodePage collapsed='1' type='int'><![CDATA[0]]></CodePage></Session><BeforeAfter collapsed='1' type='bool'><![CDATA[0]]></BeforeAfter></Usage></Properties >"
+      END DSSUBRECORD
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V5S0P1"
+      OLEType "CCustomInput"
+      Readonly "0"
+      Name "to_ip_x_lo"
+      Partner "V0S3|V0S3P6"
+      LinkType "1"
+      ConditionNotMet "fail"
+      LookupFail "fail"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "3.5"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccodbc"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "ODBCConnector"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      TransactionSize "0"
+      TXNBehaviour "0"
+      EnableTxGroup "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V6S0"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "get_loid"
+      NextID "4"
+      InputPins "V6S0P1|V6S0P2"
+      OutputPins "V6S0P3"
+      StageType "PxJoin"
+      AllowColumnMapping "0"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "operator"
+         Value "innerjoin"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "key"
+         Value "\(2)\(2)0\(1)\(3)key\(2)UNQ_ID_SRC_STM\(2)0\(1)\(3)key\(2)DSC\(2)0"
+      END DSSUBRECORD
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V6S0P1"
+      OLEType "CCustomInput"
+      Readonly "0"
+      Name "address"
+      Partner "V6S2|V6S2P1"
+      LinkType "1"
+      ConditionNotMet "fail"
+      LookupFail "fail"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      TransactionSize "0"
+      TXNBehaviour "0"
+      EnableTxGroup "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V6S0P2"
+      OLEType "CCustomInput"
+      Readonly "0"
+      Name "lo_id"
+      Partner "V6S3|V6S3P1"
+      LinkType "1"
+      ConditionNotMet "fail"
+      LookupFail "fail"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      TransactionSize "0"
+      TXNBehaviour "0"
+      EnableTxGroup "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V6S0P3"
+      OLEType "CCustomOutput"
+      Readonly "0"
+      Name "address_insert"
+      Partner "V0S3|V0S3P7"
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "11"
+         Derivation "address.ID"
+         Group "0"
+         ParsedDerivation "address.ID"
+         SourceColumn "address.ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "ID"
+         APTFieldProp "quote=none"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "COUNTRY"
+         Description =+=+=+=
+\(421)\(442)\(440)\(430)\(43D)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "2"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "2"
+         Derivation "address.COUNTRY"
+         Group "0"
+         ParsedDerivation "address.COUNTRY"
+         SourceColumn "address.COUNTRY"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "COUNTRY"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "POSTIND"
+         Description =+=+=+=
+\(418)\(43D)\(434)\(435)\(43A)\(441)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "6"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "6"
+         Derivation "address.POSTIND"
+         Group "0"
+         ParsedDerivation "address.POSTIND"
+         SourceColumn "address.POSTIND"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "POSTIND"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "REGION"
+         Description =+=+=+=
+\(420)\(435)\(433)\(438)\(43E)\(43D)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "3"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "3"
+         Derivation "address.REGION"
+         Group "0"
+         ParsedDerivation "address.REGION"
+         SourceColumn "address.REGION"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "REGION"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RTYPE"
+         Description =+=+=+=
+\(422)\(438)\(43F) \(440)\(430)\(439)\(43E)\(43D)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address.RTYPE"
+         Group "0"
+         ParsedDerivation "address.RTYPE"
+         SourceColumn "address.RTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "RTYPE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "NAMR"
+         Description =+=+=+=
+\(41D)\(430)\(438)\(43C)\(435)\(43D)\(43E)\(432)\(430)\(43D)\(438)\(435) \(440)\(430)\(439)\(43E)\(43D)\(430) 
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "100"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "100"
+         Derivation "address.NAMR"
+         Group "0"
+         ParsedDerivation "address.NAMR"
+         SourceColumn "address.NAMR"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "NAMR"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "TTYPE"
+         Description =+=+=+=
+\(422)\(438)\(43F) \(433)\(43E)\(440)\(43E)\(434)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address.TTYPE"
+         Group "0"
+         ParsedDerivation "address.TTYPE"
+         SourceColumn "address.TTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "TTYPE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "TNAME"
+         SqlType "12"
+         Precision "100"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "address.TNAME"
+         Group "0"
+         ParsedDerivation "address.TNAME"
+         SourceColumn "address.TNAME"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "TNAME"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VILTYPE"
+         Description =+=+=+=
+\(422)\(438)\(43F) \(441)\(435)\(43B)\(44C)\(441)\(43A)\(43E)\(433)\(43E) \(41D)\(421)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address.VILTYPE"
+         Group "0"
+         ParsedDerivation "address.VILTYPE"
+         SourceColumn "address.VILTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "VILTYPE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VILNAM"
+         SqlType "12"
+         Precision "100"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "address.VILNAM"
+         Group "0"
+         ParsedDerivation "address.VILNAM"
+         SourceColumn "address.VILNAM"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "VILNAM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "STRTYPE"
+         Description =+=+=+=
+\(422)\(438)\(43F) \(443)\(43B)\(438)\(446)\(44B)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address.STRTYPE"
+         Group "0"
+         ParsedDerivation "address.STRTYPE"
+         SourceColumn "address.STRTYPE"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "STRTYPE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "STRNAM"
+         Description =+=+=+=
+\(41D)\(430)\(438)\(43C)\(435)\(43D)\(43E)\(432)\(430)\(43D)\(438)\(435) \(443)\(43B)\(438)\(446)\(44B)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "100"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "100"
+         Derivation "address.STRNAM"
+         Group "0"
+         ParsedDerivation "address.STRNAM"
+         SourceColumn "address.STRNAM"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "STRNAM"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "HOUSE"
+         Description =+=+=+=
+\(41D)\(43E)\(43C)\(435)\(440) \(434)\(43E)\(43C)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "15"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "15"
+         Derivation "address.HOUSE"
+         Group "0"
+         ParsedDerivation "address.HOUSE"
+         SourceColumn "address.HOUSE"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "HOUSE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "CORP"
+         Description =+=+=+=
+\(41A)\(43E)\(440)\(43F)\(443)\(441)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "15"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "15"
+         Derivation "address.CORP"
+         Group "0"
+         ParsedDerivation "address.CORP"
+         SourceColumn "address.CORP"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "CORP"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "FLAT"
+         Description =+=+=+=
+\(41A)\(432)\(430)\(440)\(442)\(438)\(440)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "12"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Derivation "address.FLAT"
+         Group "0"
+         ParsedDerivation "address.FLAT"
+         SourceColumn "address.FLAT"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "FLAT"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "TP"
+         SqlType "4"
+         Precision "4"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "address.TP"
+         Group "0"
+         ParsedDerivation "address.TP"
+         SourceColumn "address.TP"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "TP"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "IP_ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "11"
+         Derivation "address.IP_ID"
+         Group "0"
+         ParsedDerivation "address.IP_ID"
+         SourceColumn "address.IP_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "IP_ID"
+         APTFieldProp "quote=none"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "IP_X_LO_TP_ID"
+         SqlType "5"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "address.IP_X_LO_TP_ID"
+         Group "0"
+         ParsedDerivation "address.IP_X_LO_TP_ID"
+         SourceColumn "address.IP_X_LO_TP_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "IP_X_LO_TP_ID"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "UNQ_ID_SRC_STM"
+         SqlType "1"
+         Precision "20"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "address.UNQ_ID_SRC_STM"
+         Group "0"
+         ParsedDerivation "address.UNQ_ID_SRC_STM"
+         SourceColumn "address.UNQ_ID_SRC_STM"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "UNQ_ID_SRC_STM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "DSC"
+         SqlType "12"
+         Precision "256"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "address.DSC"
+         Group "0"
+         ParsedDerivation "address.DSC"
+         SourceColumn "address.DSC"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "DSC"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "EFF_DT"
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "address.EFF_DT"
+         Group "0"
+         ParsedDerivation "address.EFF_DT"
+         SourceColumn "address.EFF_DT"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "EFF_DT"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "LO_ID"
+         SqlType "4"
+         Precision "4"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "lo_id.LO_ID"
+         Group "0"
+         ParsedDerivation "lo_id.LO_ID"
+         SourceColumn "lo_id.LO_ID"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\address_insert2\\insert_tmp3"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "LO_ID"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      LeftTextPos "238"
+      TopTextPos "267"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V6S2"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "address_insert"
+      NextID "2"
+      OutputPins "V6S2P1"
+      StageType "PxDataSet"
+      AllowColumnMapping "0"
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V6S2P1"
+      OLEType "CCustomOutput"
+      Readonly "0"
+      Name "address"
+      Partner "V6S0|V6S0P1"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "dataset"
+         Value "#PS_CONNECTIONS.CDB_FILE_PATH#guarant_address_load.ds"
+      END DSSUBRECORD
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "11"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "ID"
+         APTFieldProp "quote=none"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "COUNTRY"
+         Description =+=+=+=
+\(421)\(442)\(440)\(430)\(43D)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "2"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "2"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "COUNTRY"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "POSTIND"
+         Description =+=+=+=
+\(418)\(43D)\(434)\(435)\(43A)\(441)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "6"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "6"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "POSTIND"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "REGION"
+         Description =+=+=+=
+\(420)\(435)\(433)\(438)\(43E)\(43D)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "3"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "3"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "REGION"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RTYPE"
+         Description =+=+=+=
+\(422)\(438)\(43F) \(440)\(430)\(439)\(43E)\(43D)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "RTYPE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "NAMR"
+         Description =+=+=+=
+\(41D)\(430)\(438)\(43C)\(435)\(43D)\(43E)\(432)\(430)\(43D)\(438)\(435) \(440)\(430)\(439)\(43E)\(43D)\(430) 
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "100"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "100"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "NAMR"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "TTYPE"
+         Description =+=+=+=
+\(422)\(438)\(43F) \(433)\(43E)\(440)\(43E)\(434)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "TTYPE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "TNAME"
+         SqlType "12"
+         Precision "100"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "TNAME"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VILTYPE"
+         Description =+=+=+=
+\(422)\(438)\(43F) \(441)\(435)\(43B)\(44C)\(441)\(43A)\(43E)\(433)\(43E) \(41D)\(421)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "VILTYPE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VILNAM"
+         SqlType "12"
+         Precision "100"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "VILNAM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "STRTYPE"
+         Description =+=+=+=
+\(422)\(438)\(43F) \(443)\(43B)\(438)\(446)\(44B)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "STRTYPE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "STRNAM"
+         Description =+=+=+=
+\(41D)\(430)\(438)\(43C)\(435)\(43D)\(43E)\(432)\(430)\(43D)\(438)\(435) \(443)\(43B)\(438)\(446)\(44B)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "100"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "100"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "STRNAM"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "HOUSE"
+         Description =+=+=+=
+\(41D)\(43E)\(43C)\(435)\(440) \(434)\(43E)\(43C)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "15"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "15"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "HOUSE"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "CORP"
+         Description =+=+=+=
+\(41A)\(43E)\(440)\(43F)\(443)\(441)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "15"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "15"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "CORP"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "FLAT"
+         Description =+=+=+=
+\(41A)\(432)\(430)\(440)\(442)\(438)\(440)\(430)
+Searchable? N 
+=+=+=+=
+         SqlType "12"
+         Precision "12"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "10"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "FLAT"
+         APTFieldProp "null_field=''"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "TP"
+         SqlType "4"
+         Precision "4"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "TP"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "IP_ID"
+         Description =+=+=+=
+<none>
+Searchable? N 
+=+=+=+=
+         SqlType "4"
+         Precision "10"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "11"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "IP_ID"
+         APTFieldProp "quote=none"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "IP_X_LO_TP_ID"
+         SqlType "5"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "IP_X_LO_TP_ID"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "UNQ_ID_SRC_STM"
+         SqlType "1"
+         Precision "20"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "UNQ_ID_SRC_STM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "DSC"
+         SqlType "12"
+         Precision "256"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "DSC"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "EFF_DT"
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\DSLink15\\guarant_address_load"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "EFF_DT"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      LeftTextPos "149"
+      TopTextPos "351"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V6S3"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "address_loid"
+      NextID "2"
+      OutputPins "V6S3P1"
+      StageType "PxSequentialFile"
+      AllowColumnMapping "0"
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V6S3P1"
+      OLEType "CCustomOutput"
+      Readonly "0"
+      Name "lo_id"
+      Partner "V6S0|V6S0P2"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "schema"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "selection"
+         Value "file"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "file "
+         Value "\(2)\(2)0\(1)\(3)file \(2)#PS_CONNECTIONS.CDB_FILE_PATH#guarant_address_lo.txt\(2)0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "keepPartitions"
+         Value " "
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "missingFile"
+         Value " "
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "rejects"
+         Value "continue"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "reportProgress"
+         Value "yes"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "firstLineColumnNames"
+         Value " "
+      END DSSUBRECORD
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "LO_ID"
+         SqlType "4"
+         Precision "4"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\address_insert2\\insert_tmp3"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "LO_ID"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "UNQ_ID_SRC_STM"
+         SqlType "1"
+         Precision "20"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\address_insert2\\insert_tmp3"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "UNQ_ID_SRC_STM"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "DSC"
+         SqlType "12"
+         Precision "256"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         TableDef "Saved\\address_insert2\\insert_tmp3"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ColumnReference "DSC"
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "SchemaFormat"
+         Value "final_delim=end, delim='|', quote=double"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      LeftTextPos "144"
+      TopTextPos "211"
+   END DSRECORD
+END DSJOB
